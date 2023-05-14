@@ -8,6 +8,7 @@ class CarRacing:
     def __init__(self):
 
         pygame.init()
+        
         self.display_width = 800
         self.display_height = 600
         self.black = (0, 0, 0)
@@ -18,7 +19,7 @@ class CarRacing:
         self.initialize()
 
     def initialize(self):
-
+        random.seed(450)
         self.crashed = False
 
         self.carImg = pygame.image.load('./img/car.png')
@@ -77,6 +78,7 @@ class CarRacing:
 
             if self.enemy_car_starty > self.display_height:
                 self.enemy_car_starty = 0 - self.enemy_car_height
+            # environment    
                 self.enemy_car_startx = random.randrange(310, 450)
 
             self.car(self.car_x_coordinate, self.car_y_coordinate)
