@@ -1,6 +1,6 @@
 import random
 from time import sleep
-
+import server as serv
 import pygame
 
 
