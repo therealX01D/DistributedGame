@@ -1,9 +1,12 @@
 import asyncio
+import json
 from websockets.sync.client import connect
-
-def hello(msg):
+def parsedata(x,y):
+    data= {"X":x,"y":y}
+    return json.dump(data)
+def send(msg):
     with connect("ws://localhost:8765") as websocket:
-        websocket.send("Hello world!")
+        websocket.send(msg)
         message = websocket.recv()
         print(f"Received: {message}")
 

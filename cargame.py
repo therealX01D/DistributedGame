@@ -1,6 +1,6 @@
 import random
 from time import sleep
-import server as serv
+import client
 import pygame
 
 
@@ -69,7 +69,8 @@ class CarRacing:
                         self.car_x_coordinate += 50
                         print ("CAR X COORDINATES: %s" % self.car_x_coordinate)
                     print ("x: {x}, y: {y}".format(x=self.car_x_coordinate, y=self.car_y_coordinate))
-
+                    msg=client.parsedata(x=self.car_x_coordinate, y=self.car_y_coordinate)
+                    client.hello(msg)
             self.gameDisplay.fill(self.black)
             self.back_ground_raod()
 
