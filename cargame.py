@@ -5,10 +5,10 @@ import pygame
 
 
 class CarRacing:
-    def __init__(self):
+    def __init__(self,room):
 
         pygame.init()
-        
+        self.room=room
         self.display_width = 800
         self.display_height = 600
         self.black = (0, 0, 0)
@@ -69,7 +69,7 @@ class CarRacing:
                         self.car_x_coordinate += 50
                         print ("CAR X COORDINATES: %s" % self.car_x_coordinate)
                     print ("x: {x}, y: {y}".format(x=self.car_x_coordinate, y=self.car_y_coordinate))
-                    msg=client.parsedata(x=self.car_x_coordinate, y=self.car_y_coordinate)
+                    msg=client.parsedata(token=token,x=self.car_x_coordinate, y=self.car_y_coordinate)
                     client.send(msg)
             self.gameDisplay.fill(self.black)
             self.back_ground_raod()

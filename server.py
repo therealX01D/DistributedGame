@@ -4,6 +4,8 @@ import asyncio
 from websockets.server import serve
 import json
 
+gamerooms={}
+chatrooms={}
 async def error(websocket, message):
     event = {
         "type": "error",
@@ -14,8 +16,9 @@ async def error(websocket, message):
 async def Handler(websocket):
     async for message in websocket:
         dic=json.loads(message)
-        if dic["type"]=="init":
+        if dic["type"]=="initgameroom":
             #todo: create a join key and return it
+            
             pass
         print(message)
         await websocket.send(message)
