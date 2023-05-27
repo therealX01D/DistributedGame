@@ -2,8 +2,45 @@ import pygame
 import time
 import math
 import Helpers
+import threading
+import asyncio
+import pygame
+import server
 
 
+##SERVER THREAD INIT
+def start_server(loop, future):
+    print("Server Thread Started")
+    loop.run_until_complete(server.main(future))
+
+def stop_server(loop, future):
+    print("SERVER THREAD CLOSING")
+    loop.call_soon_threadsafe(future.set_result, None)
+
+
+loop = asyncio.get_event_loop() #create event loop if it dosen't exist
+#Or get it if it exists
+#Event loop won't run until we tell it to do
+#NOTE : If it wasn't already running
+future = loop.create_future() #Future represents the result of an asynchronous operation.
+# It is a placeholder for a value that may not be available yet
+
+thread = threading.Thread(target=start_server, args=(loop, future))
+#create thread with the given event loop that won't run here but run at server
+#Also we have future of that loop
+print("STARTING SERVER THREAD")
+thread.start() #start server thread
+
+
+##Server Thread END####
+
+##init pygame
+pygame.init()
+pygame.fastevent.init()
+##PYGAME INIT END
+
+
+##GAME ASSETS
 GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
 TRACK = pygame.image.load("imgs/track.png")
 FINISH= Helpers.scaleImage(pygame.image.load("imgs/finish.png"),0.9,0.9)
@@ -32,7 +69,7 @@ class AbstractCar:
         self.acceleration = 0.05
 
     def rotate(self, left=False, right=False):
-        self.angle += left * 1 + right * -1
+        self.angle += left * 2 + right * -2
 
     def draw(self, win):
         Helpers.blit_rotate_center(win, self.img, (self.x, self.y), self.angle)
@@ -64,6 +101,10 @@ class PlayerCar(AbstractCar):
     IMG = RED_CAR
     START_POS = (180, 200)
 
+class OnlineCar(AbstractCar):
+    IMG = GREEN_CAR
+    START_POS = (150, 200)
+
 
 
 def DrawCar(win,player_car):
@@ -76,16 +117,43 @@ clock = pygame.time.Clock()
 i = 0
 
 player_car = PlayerCar(4, 4)
+Online_car = OnlineCar(4, 4)
+##GAME ASSETS END #######
+
+##GAME MAIN LOOP
 while run:
     clock.tick(FPS)
     DrawImages(WIN,myimages)
     DrawCar(WIN,player_car)
-
+    DrawCar(WIN,Online_car)
+    # REDUCE = 1
     pygame.display.update() # update screen
+
+    REDUCE = True
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = 0
             break
+        elif event.type == server.EVENTTYPE:
+            mssg = event.message
+            print("whole message from C: ", mssg)
+            array = mssg.split(",")
+            print("splitted msg" , array)
+            if "left" in array:
+                Online_car.rotate(left=1)
+            if "right" in array:
+                Online_car.rotate(right=1)
+
+            if "up" in array:
+                Online_car.move_forward()
+                REDUCE  = False
+            if "down" in array:
+                Online_car.move_backward()
+                REDUCE  = False
+
+
+    if REDUCE:
+        Online_car.reduce_speed()
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         player_car.rotate(left=1)
@@ -98,6 +166,12 @@ while run:
         player_car.move_backward()
     if (not keys[pygame.K_UP]) and (not keys[pygame.K_DOWN]):
         player_car.reduce_speed()
+    DrawCar(WIN,player_car)
+    DrawCar(WIN,Online_car)
 
-
+print("Stoping Server event loop")
+stop_server(loop, future)
+print("Waiting for termination")
+thread.join()
+print("Shutdown pygame")
 pygame.quit()
