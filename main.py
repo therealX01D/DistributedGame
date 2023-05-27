@@ -1,17 +1,19 @@
-import pygame
 import time
 import math
 import Helpers
 import threading
 import asyncio
 import pygame
-import server
-
+# import server
+import json
+import GameWebsocket
+#TODO: get all players from server and update the game accordingly each player will have class iniated at the start of the game
 
 ##SERVER THREAD INIT
 def start_server(loop, future):
     print("Server Thread Started")
-    loop.run_until_complete(server.main(future))
+    # loop.run_until_complete(server.main(future))
+    loop.run_until_complete(GameWebsocket.main(future))
 
 def stop_server(loop, future):
     print("SERVER THREAD CLOSING")
@@ -46,9 +48,11 @@ TRACK = pygame.image.load("imgs/track.png")
 FINISH= Helpers.scaleImage(pygame.image.load("imgs/finish.png"),0.9,0.9)
 TRACK_BORDER = Helpers.scaleImage(pygame.image.load("imgs/track-border.png"),0.9,0.9)
 
-RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.55,0.55)
-GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"),0.55,0.55)
-
+RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
+GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"),0.3,0.3)
+GREY_CAR = Helpers.scaleImage(pygame.image.load("imgs/grey-car.png"),0.3,0.3)
+PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"),0.3,0.3)
+CAR_IMGS = [RED_CAR,GREEN_CAR,GREY_CAR,PURPLE_CAR]
 WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -57,6 +61,9 @@ myimages = [(GRASS,(0,0)),(TRACK,(0,0)),(FINISH,(0,0))]
 def DrawImages(win,images):
     for image,pos in images:
         WIN.blit(image,pos)
+
+def DrawCar(win,player_car):
+    player_car.draw(win)
 
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
@@ -97,77 +104,50 @@ class AbstractCar:
             self.vel = min(self.vel + self.acceleration / 4, 0)
         self.move()
 
+#each player in game will have this class
 class PlayerCar(AbstractCar):
     IMG = RED_CAR
     START_POS = (180, 200)
+    def __init__(self, max_vel, rotation_vel, CarID,StartPos):     #TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
+        super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
+        self.CarID = CarID
+        self.StartPos = StartPos
+        IMG = CAR_IMGS[CarID]
+        START_POS = StartPos #use self.x better
 
-class OnlineCar(AbstractCar):
-    IMG = GREEN_CAR
-    START_POS = (150, 200)
 
 
-
-def DrawCar(win,player_car):
-    player_car.draw(win)
-
-FPS = 60
 pygame.display.set_caption("Racing Game!")
 run = 1
 clock = pygame.time.Clock()
 i = 0
 
-player_car = PlayerCar(4, 4)
-Online_car = OnlineCar(4, 4)
+
+player1 = PlayerCar(4,4,0,(180,250)) #RED
+player2 = PlayerCar(4,4,1,(170,250)) #GREEN
+arr_players_class = [player1,player2]
+
 ##GAME ASSETS END #######
 
 ##GAME MAIN LOOP
 while run:
-    clock.tick(FPS)
     DrawImages(WIN,myimages)
-    DrawCar(WIN,player_car)
-    DrawCar(WIN,Online_car)
-    # REDUCE = 1
-    pygame.display.update() # update screen
 
     REDUCE = True
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = 0
             break
-        elif event.type == server.EVENTTYPE:
-            mssg = event.message
-            print("whole message from C: ", mssg)
-            array = mssg.split(",")
-            print("splitted msg" , array)
-            if "left" in array:
-                Online_car.rotate(left=1)
-            if "right" in array:
-                Online_car.rotate(right=1)
-
-            if "up" in array:
-                Online_car.move_forward()
-                REDUCE  = False
-            if "down" in array:
-                Online_car.move_backward()
-                REDUCE  = False
-
-
-    if REDUCE:
-        Online_car.reduce_speed()
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player_car.rotate(left=1)
-    if keys[pygame.K_RIGHT]:
-        player_car.rotate(right=1)
-
-    if keys[pygame.K_UP]:
-        player_car.move_forward()
-    if keys[pygame.K_DOWN]:
-        player_car.move_backward()
-    if (not keys[pygame.K_UP]) and (not keys[pygame.K_DOWN]):
-        player_car.reduce_speed()
-    DrawCar(WIN,player_car)
-    DrawCar(WIN,Online_car)
+        elif event.type == GameWebsocket.EVENTTYPE:
+            GameStatus = event.message #   {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
+            LoadedGameStatus = json.loads(GameStatus)
+            for key in LoadedGameStatus:
+                player_id = int(key)
+                p_status = LoadedGameStatus["key"]
+                arr_players_class[player_id].x = p_status["posx"]
+                arr_players_class[player_id].y = p_status["posy"]
+                arr_players_class[player_id].angle = p_status["angle"]
+            pygame.display.update()  # update screen
 
 print("Stoping Server event loop")
 stop_server(loop, future)

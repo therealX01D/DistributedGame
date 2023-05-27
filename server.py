@@ -5,7 +5,6 @@ import pygame
 IPADDRESS = "localhost"
 PORT = 1761
 
-EVENTTYPE = pygame.event.custom_type()
 
 # handler processes the message and sends "Success" back to the client
 async def handler(websocket, path):
