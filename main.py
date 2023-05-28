@@ -13,7 +13,6 @@ import GameWebSocketMultithreaded
 ##SERVER THREAD INIT
 def start_server(loop, future):
     print("Server Thread Started")
-    # loop.run_until_complete(server.main(future))
     loop.run_until_complete(GameWebSocketMultithreaded.main(future))
 
 def stop_server(loop, future):
@@ -141,7 +140,7 @@ while run:
     print("MAIN START")
     REDUCE = True
     for event in pygame.event.get():
-        print("EVS TRASH",event)
+        print("EV MSG" , event.message)
         if event.type == pygame.QUIT:
             run = 0
             break
@@ -151,12 +150,13 @@ while run:
             LoadedGameStatus = json.loads(GameStatus)
             for key in LoadedGameStatus:
                 player_id = int(key)
-                p_status = LoadedGameStatus["key"]
+                p_status = LoadedGameStatus[str(player_id)]
                 arr_players_class[player_id].x = p_status["posx"]
                 arr_players_class[player_id].y = p_status["posy"]
                 arr_players_class[player_id].angle = p_status["angle"]
+
     print("Main before sleep")
-    time.sleep(2)
+    time.sleep(0.1)
 
 print("Stoping Server event loop")
 stop_server(loop, future)
