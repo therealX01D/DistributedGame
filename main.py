@@ -4,10 +4,9 @@ import Helpers
 import threading
 import asyncio
 import pygame
-# import server
 import json
-import GameWebsocket
 import GameWebSocketMultithreaded
+from GameWebSocketMultithreaded import wsEV,kbtEV
 #TODO: get all players from server and update the game accordingly each player will have class iniated at the start of the game
 
 ##SERVER THREAD INIT
@@ -125,28 +124,30 @@ run = 1
 clock = pygame.time.Clock()
 i = 0
 
-
+#THIS
 player1 = PlayerCar(4,4,0,(180,250)) #RED
 player2 = PlayerCar(4,4,1,(170,250)) #GREEN
 arr_players_class = [player1,player2]
+###########################################
 
 ##GAME ASSETS END #######
 
 ##GAME MAIN LOOP
 
+
+##THIS
 while run:
+    print("MAIN START")
     DrawImages(WIN, myimages)
     pygame.display.update()  # update screen
-    print("MAIN START")
     REDUCE = True
     for event in pygame.event.get():
-        print("EV MSG" , event.message)
         if event.type == pygame.QUIT:
             run = 0
             break
-        elif event.type == GameWebsocket.EVENTTYPE:
-            print("GOT EVENT ",event.message)
+        elif event.type == GameWebSocketMultithreaded.EVENTTYPE:
             GameStatus = event.message #   {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
+            print(f"[pygame recieved Game Status]: {GameStatus}")
             LoadedGameStatus = json.loads(GameStatus)
             for key in LoadedGameStatus:
                 player_id = int(key)
@@ -154,9 +155,11 @@ while run:
                 arr_players_class[player_id].x = p_status["posx"]
                 arr_players_class[player_id].y = p_status["posy"]
                 arr_players_class[player_id].angle = p_status["angle"]
+        wsEV.set()
+        kbtEV.set()
+    time.sleep(0.04)
 
     print("Main before sleep")
-    time.sleep(0.1)
 
 print("Stoping Server event loop")
 stop_server(loop, future)
