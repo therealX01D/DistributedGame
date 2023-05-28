@@ -15,6 +15,7 @@ connected_clients_WSs = set()
 users = set()
 IP__username = {}
 username__id = {}
+GS = None
 ##PYGAME ASSETS
 RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
 GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"),0.3,0.3)
@@ -82,31 +83,39 @@ arr_players_class = [player1,player2]
 EVENTTYPE = pygame.event.custom_type()
 
 # handler processes the message and sends "Success" back to the client
-async def handler(websocket, path):
+async def handler(ws, path):
     print("inside Handeler")
     #websocket is the client websocket
-    async for message in websocket:
+    async for message in ws:
         global curr_players
         #if recieved message is a new connection
-        registered_before = (websocket.remote_address[0] in connected_clients_IPs) #TODO : later make it with username
-        print(f"{websocket.remote_address , connected_clients_IPs}")
+        registered_before = (ws.remote_address[0] in connected_clients_IPs)
+        connected_clients_WSs.add(ws)
+        print(f"{ws.remote_address , connected_clients_IPs}")
         try:
             loaded_jsn_mssg = json.loads(message)
         except:
             loaded_jsn_mssg = message
+
+
+        if loaded_jsn_mssg=='close':
+            connected_clients_WSs.remove(ws)
+            break
+
+
         print(f"loaded_mssg{loaded_jsn_mssg} , currplayer{curr_players} , maxPlayer{max_players}" )
         if curr_players<max_players and not registered_before:
-            connected_clients_WSs.add(websocket)
+            connected_clients_WSs.add(ws)
             print(f"GAME NOT READY YET , {curr_players}/{max_players} joined")
-            connected_clients_IPs.add(websocket.remote_address[0])
+            connected_clients_IPs.add(ws.remote_address[0])
             username = loaded_jsn_mssg["username"]
             print(f" dict{loaded_jsn_mssg} : username is :{loaded_jsn_mssg['username']}")
-            IP = websocket.remote_address[0]
+            IP = ws.remote_address[0]
             print(f"IP address is {type(IP)}")
             IP__username[IP] = username
             username__id[username] = curr_players
-            playerCarId = json.dumps({"carID": str(curr_players)})
-            websocket.send(playerCarId)
+            playerCarId = json.dumps({"carID": curr_players})
+            await ws.send(playerCarId)
             curr_players=curr_players+1
             #add player to the game
             if curr_players == max_players:
@@ -116,19 +125,25 @@ async def handler(websocket, path):
         elif curr_players>=max_players and not registered_before:
             print(f"GAME READY AND YOU ARE NOT INVITED :( ")
             ER_MSG = json.dumps({"ERROR" : "GameFull!"})
-            websocket.send(ER_MSG)
+            ws.send(ER_MSG)
+
+
         elif curr_players>=max_players and registered_before:
             print(f"GAME READY AND RECIEVED SOMETHING FROM OLD USER :/ , {message}")
+
             if type(loaded_jsn_mssg) == str:
-                print("MESSAGE IS A STRING ?? " , loaded_jsn_mssg)
-                processMovement(websocket,loaded_jsn_mssg)
-            elif "movement" in loaded_jsn_mssg.keys():
+                loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
+            if "movement" in loaded_jsn_mssg.keys():
                 movs = loaded_jsn_mssg["movement"]
                 print("IT's a movement :) ")
                 print(f"type {type(movs)} , {movs}")
-                processMovement(websocket,movs)
+                processMovement(ws,movs)
+                prepareGameStatus()
+                await ws.send(json.dumps(GS))
+
+
             elif "username" in loaded_jsn_mssg.keys():
-                    await websocket.send("READY")
+                    await ws.send("READY")
 
 
 def processMovement(ws,message):
@@ -157,36 +172,39 @@ def processMovement(ws,message):
         mover_player_car.reduce_speed()
     print("processed movement")
     print("GOING TO prepare game status")
-    prepareGameStatus()
-
-async def broadcast(message):
-    # Iterate over all connected clients and send the message
-    print("inside BROADCASTING message..")
-    for client in connected_clients_WSs:
-        try:
-            await client.send(message)
-        except:
-            print(f"client ({client.remote_address}) no longer available removing it")
-            connected_clients_WSs.remove(client)
-
-
 
 def prepareGameStatus():
     # Iterate over all connected clients and send the message
-    print("BROADCASTING GAME STATUS ")
-    cnt = 0
     playerStatus = {}
     for i in range(max_players):
         p = arr_players_class[i]
         playerStatus[str(i)] = {'posx': p.x ,'posy': p.y ,'angle' : p.angle}
+    print("Prepared and Will BROADCASTING GAME STATUS... ")
 
     gameStatus = {'game' : playerStatus}
     DumpedGameStatus = json.dumps(gameStatus)
     print(f"gamestaus ready to broadcast : {gameStatus}")
+    global GS
+    GS = gameStatus
     #send game status to everyone
+    # broadcast(DumpedGameStatus)
+    # print("Broadcasted game status")
 
-    broadcast(DumpedGameStatus)
-    print("Broadcasted game status")
+def broadcast(message):
+    # Iterate over all connected clients and send the message
+    print("inside BROADCASTING message..")
+    for client in connected_clients_WSs:
+        try:
+            client.send(message)
+            print("EXSTING CLIENT message sent succeffly to ", client.remote_address)
+        except:
+            print(f"OLD client client ({client.remote_address}) no longer available removing it")
+            connected_clients_WSs.remove(client)
+    print("FINISHED BROADCASTING")
+
+
+
+
 
 
 startServer = websockets.serve(handler, IPADDRESS, PORT)
