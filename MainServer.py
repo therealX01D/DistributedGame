@@ -130,7 +130,6 @@ async def handler(ws, path):
 
         elif curr_players>=max_players and registered_before:
             print(f"GAME READY AND RECIEVED SOMETHING FROM OLD USER :/ , {message}")
-
             if type(loaded_jsn_mssg) == str:
                 loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
             if "movement" in loaded_jsn_mssg.keys():
@@ -201,10 +200,6 @@ async def broadcast(message):
             print(f"OLD client client ({client.remote_address}) no longer available removing it")
             connected_clients_WSs.remove(client)
     print("FINISHED BROADCASTING")
-
-
-
-
 
 
 startServer = websockets.serve(handler, IPADDRESS, PORT)

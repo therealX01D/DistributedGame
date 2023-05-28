@@ -15,10 +15,7 @@ kbtEV = threading.Event()
 wsEV = threading.Event()
 guiEV = threading.Event()
 GameStatus = None
-#TODO : Now It works after disconnecting and reconnecting !!
-#TODO json dumps and loads causes this but where (in connection)
-#TODO : client send only dicts
-#DONE: Problem was not waiting at server to send message 
+
 
 ##GAME ASSETS
 GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
@@ -33,8 +30,8 @@ PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"),0.3,0.3
 CAR_IMGS = [RED_CAR,GREEN_CAR,GREY_CAR,PURPLE_CAR]
 WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-
 myimages = [(GRASS,(0,0)),(TRACK,(0,0)),(FINISH,(0,0))]
+
 def DrawImages(win,images):
     for image,pos in images:
         WIN.blit(image,pos)
@@ -102,6 +99,7 @@ def GUI():
     pygame.init()
     run = 1
     while run:
+
         guiEV.wait()
         print(f"GUI THREAD..")
         DrawImages(WIN, myimages)
@@ -125,6 +123,7 @@ def GUI():
 
 def kbthread():
     while 1:
+        kbtEV.wait()
         print(f"KB THREAD..")
         global kbbtns
         kbbtns = ""
@@ -153,6 +152,8 @@ def kbthread():
         movement = json.dumps({"movement":kbbtns})
         print("MOVEMENT : ",type(movement),"->" , movement)
         WS.send(movement)
+        kbtEV.clear()
+
 
 
 # username = input("ENTER : USERNAME")
@@ -164,6 +165,7 @@ def on_open(ws):
     ws.send(UN)
 
 def on_message(ws, message):
+    kbtEV.clear()
     print('(ON MESSAGE) ..S')
     print(f"[Received From Server] {message}")
 
@@ -174,25 +176,43 @@ def on_message(ws, message):
         loaded_jsn_msg = message
 
     print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
-    if type(message)==str:
+    if isinstance(loaded_jsn_msg, str):
         if message == "READY":
             print("I GOT 'READY' message..")
 
-    if type(message) == dict:
-        if ( "carID" in loaded_jsn_msg.keys()):
+    if isinstance(loaded_jsn_msg, dict):
+        print("ITS DICT")
+        #TODO : Dosen't reach here when recieve message of {"game" : ..}
+        if "carID" in loaded_jsn_msg.keys():
             global carID
             carID = int(loaded_jsn_msg["carID"])
 
-        elif type(message) == dict and ("game" in loaded_jsn_msg.keys()):
+        elif "game" in loaded_jsn_msg.keys():
             gameStatus = loaded_jsn_msg["game"]
             print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
             global GameStatus
             GameStatus = gameStatus
-            print("GLOBAL GAME STATUS CHANGED ....")
+            print("GLOBAL GAME STATUS CHANGING ....")
+            print(f"GUI THREAD..")
+            DrawImages(WIN, myimages)
+            print("BEFORE UPD DISPLAY")
+            pygame.display.update()  # update screen
+            print("UPDATE DISPLAY")
+            for key in gameStatus:
+                player_id = int(key)
+                print(f"key({key}) player{player_id} :> status {gameStatus[key]}")
+                p_status = gameStatus[key]
+                arr_players_class[player_id].x = p_status["posx"]
+                arr_players_class[player_id].y = p_status["posy"]
+                arr_players_class[player_id].angle = p_status["angle"]
+                print(f"[player C] :{type(arr_players_class[player_id])}")
+                DrawCar(WIN,arr_players_class[player_id])
+                print("[[Game status changed]]")
+            pygame.display.update()  # update screen
 
     print(f"(ON MESSAGE) ..E")
     print("setted GUI ev")
-    guiEV.set()
+    kbtEV.set()
 
 
 def on_error(ws, error):
@@ -207,7 +227,7 @@ def on_close(wsa, close_status_code, close_msg="close"):
 
 # async def main(future):
 def s():
-
+    pygame.init()
     global WS
     ws = websocket.WebSocketApp(server,
                                 on_open=on_open,
@@ -221,8 +241,8 @@ def s():
     kbt = threading.Thread(target=kbthread)
     print("Starting kbthread")
     kbt.start()
-    pygamethread = threading.Thread(target=GUI())
-    pygamethread.start()
+    # pygamethread = threading.Thread(target=GUI())
+    # pygamethread.start()
 
     while 1:
         ws.run_forever()
