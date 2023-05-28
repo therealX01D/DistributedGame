@@ -95,31 +95,6 @@ arr_players_class = [player1,player2]
 
 ##END OF ASSETS
 
-def GUI():
-    pygame.init()
-    run = 1
-    while run:
-
-        guiEV.wait()
-        print(f"GUI THREAD..")
-        DrawImages(WIN, myimages)
-        pygame.display.update()  # update screen
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = 0
-                break
-        global GameStatus
-        if type(GameStatus) ==  dict:
-            for key in GameStatus:
-                player_id = int(key)
-                p_status = GameStatus[key]
-                arr_players_class[player_id].x = p_status["posx"]
-                arr_players_class[player_id].y = p_status["posy"]
-                arr_players_class[player_id].angle = p_status["angle"]
-        pygame.display.update()  # update screen
-        guiEV.clear()
-
-    pygame.quit()
 
 def kbthread():
     while 1:
