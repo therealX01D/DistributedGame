@@ -157,7 +157,6 @@ def on_message(ws, message):
 
     if isinstance(loaded_jsn_msg, dict):
         print("ITS DICT")
-        #TODO : Dosen't reach here when recieve message of {"game" : ..}
         if "carID" in loaded_jsn_msg.keys():
             global carID
             carID = int(loaded_jsn_msg["carID"])
@@ -168,7 +167,6 @@ def on_message(ws, message):
             global GameStatus
             GameStatus = gameStatus
             print("GLOBAL GAME STATUS CHANGING ....")
-            print(f"GUI THREAD..")
             DrawImages(WIN, myimages)
             print("BEFORE UPD DISPLAY")
             pygame.display.update()  # update screen
@@ -185,6 +183,7 @@ def on_message(ws, message):
                 print("[[Game status changed]]")
             pygame.display.update()  # update screen
 
+    pygame.display.update()  # update screen
     print(f"(ON MESSAGE) ..E")
     print("setted GUI ev")
     kbtEV.set()

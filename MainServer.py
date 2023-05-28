@@ -167,7 +167,7 @@ def processMovement(ws,message):
     if "down" in movements:
         mover_player_car.move_backward()
         REDUCE = False
-    if not REDUCE:
+    if  REDUCE or message=="NULL":
         mover_player_car.reduce_speed()
     print("processed movement")
     print("GOING TO prepare game status")
