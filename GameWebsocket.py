@@ -83,7 +83,6 @@ def on_error(ws, error):
     print("Errorz:", error)
 
 def on_close(wsa, close_status_code, close_msg):
-    #TODO : change status of username to disconnected
     print("Connection closed")
 
 

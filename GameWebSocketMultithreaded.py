@@ -5,7 +5,6 @@ carID = -1
 kbbtns = "NULL"
 import websocket
 import pygame
-EVENTTYPE = pygame.event.custom_type()
 import threading
 import keyboard
 import time
@@ -14,7 +13,13 @@ import math
 WS = None
 kbtEV = threading.Event()
 wsEV = threading.Event()
+guiEV = threading.Event()
 GameStatus = None
+#TODO : Now It works after disconnecting and reconnecting !!
+#TODO json dumps and loads causes this but where (in connection)
+#TODO : client send only dicts
+#DONE: Problem was not waiting at server to send message 
+
 ##GAME ASSETS
 GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
 TRACK = pygame.image.load("imgs/track.png")
@@ -92,36 +97,37 @@ player2 = PlayerCar(4,4,1,(170,250)) #GREEN
 arr_players_class = [player1,player2]
 
 ##END OF ASSETS
-# def GUI():
-#     run = 1
-#     while run:
-#         print("MAIN START")
-#         DrawImages(WIN, myimages)
-#         pygame.display.update()  # update screen
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 run = 0
-#                 break
-#         global GameStatus
-#
-#         for key in GameStatus:
-#             player_id = int(key)
-#             p_status = GameStatus[key]
-#             arr_players_class[player_id].x = p_status["posx"]
-#             arr_players_class[player_id].y = p_status["posy"]
-#             arr_players_class[player_id].angle = p_status["angle"]
-#         pygame.display.update()  # update screen
-#
-#     pygame.quit()
+
+def GUI():
+    pygame.init()
+    run = 1
+    while run:
+        guiEV.wait()
+        print(f"GUI THREAD..")
+        DrawImages(WIN, myimages)
+        pygame.display.update()  # update screen
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = 0
+                break
+        global GameStatus
+        if type(GameStatus) ==  dict:
+            for key in GameStatus:
+                player_id = int(key)
+                p_status = GameStatus[key]
+                arr_players_class[player_id].x = p_status["posx"]
+                arr_players_class[player_id].y = p_status["posy"]
+                arr_players_class[player_id].angle = p_status["angle"]
+        pygame.display.update()  # update screen
+        guiEV.clear()
+
+    pygame.quit()
 
 def kbthread():
     while 1:
-        kbtEV.wait()
-        # time.sleep(0.2)
-        print(f"KBTHREAD")
+        print(f"KB THREAD..")
         global kbbtns
         kbbtns = ""
-        print("INSIDE kbthread")
         if keyboard.is_pressed("a"):
             kbbtns = "left"
 
@@ -147,7 +153,6 @@ def kbthread():
         movement = json.dumps({"movement":kbbtns})
         print("MOVEMENT : ",type(movement),"->" , movement)
         WS.send(movement)
-        kbtEV.clear()
 
 
 # username = input("ENTER : USERNAME")
@@ -159,9 +164,8 @@ def on_open(ws):
     ws.send(UN)
 
 def on_message(ws, message):
-    wsEV.wait()
-    print('(ON MESSAGE)S')
-    print("recieved message :::: " , message)
+    print('(ON MESSAGE) ..S')
+    print(f"[Received From Server] {message}")
 
     try:
         loaded_jsn_msg = json.loads(message)
@@ -169,28 +173,30 @@ def on_message(ws, message):
         print("NOT JSON MESSAGE : ", message)
         loaded_jsn_msg = message
 
-    if message == "READY":
-        print("I GOT 'READY' message..")
+    print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
+    if type(message)==str:
+        if message == "READY":
+            print("I GOT 'READY' message..")
 
-    elif "carID" in loaded_jsn_msg.keys():
-        loadedJsn = json.loads(loaded_jsn_msg)
-        global carID
-        carID = int(loadedJsn["car"])
+    if type(message) == dict:
+        if ( "carID" in loaded_jsn_msg.keys()):
+            global carID
+            carID = int(loaded_jsn_msg["carID"])
 
-    elif "game" in loaded_jsn_msg.keys():
-        gameStatus = loaded_jsn_msg["game"]
-        print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
-        PygameMessage  = json.dumps(gameStatus)
-        pygame.fastevent.post(pygame.event.Event(EVENTTYPE, message=PygameMessage)) #TODO : GAME DOSEN't READ IT (cant reach main)
-        print("SENT MESSAGE TO PYGAME")
-        time.sleep(0.04)
+        elif type(message) == dict and ("game" in loaded_jsn_msg.keys()):
+            gameStatus = loaded_jsn_msg["game"]
+            print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
+            global GameStatus
+            GameStatus = gameStatus
+            print("GLOBAL GAME STATUS CHANGED ....")
 
-    print(f"(ON MESSAGE)E")
-    wsEV.clear()
+    print(f"(ON MESSAGE) ..E")
+    print("setted GUI ev")
+    guiEV.set()
 
 
 def on_error(ws, error):
-    print("Error11:", error)
+    print("*Error*", error)
 
 def on_close(wsa, close_status_code, close_msg="close"):
     #TODO : change status of username to disconnected
@@ -199,8 +205,8 @@ def on_close(wsa, close_status_code, close_msg="close"):
     print("Connection closing")
 
 
-async def main(future):
-
+# async def main(future):
+def s():
 
     global WS
     ws = websocket.WebSocketApp(server,
@@ -215,14 +221,15 @@ async def main(future):
     kbt = threading.Thread(target=kbthread)
     print("Starting kbthread")
     kbt.start()
-    # pygamethread = threading.Thread(target=GUI())
-    # pygamethread.start()
+    pygamethread = threading.Thread(target=GUI())
+    pygamethread.start()
 
     while 1:
         ws.run_forever()
         print("RECONNECTING")
 
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# if __name__ == "__main__":
+#     asyncio.run(main())
+s()
 

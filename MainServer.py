@@ -93,12 +93,12 @@ async def handler(ws, path):
         connected_clients_WSs.add(ws)
         print(f"{ws.remote_address , connected_clients_IPs}")
         try:
-            loaded_jsn_mssg = json.loads(message)
+            if not (type(message) == dict):
+                loaded_jsn_mssg = json.loads(message)
         except:
             loaded_jsn_mssg = message
 
-
-        if loaded_jsn_mssg=='close':
+        if type(loaded_jsn_mssg) == str and message =='close':
             connected_clients_WSs.remove(ws)
             break
 
@@ -190,12 +190,12 @@ def prepareGameStatus():
     # broadcast(DumpedGameStatus)
     # print("Broadcasted game status")
 
-def broadcast(message):
+async def broadcast(message):
     # Iterate over all connected clients and send the message
     print("inside BROADCASTING message..")
     for client in connected_clients_WSs:
         try:
-            client.send(message)
+            await client.send(message)
             print("EXSTING CLIENT message sent succeffly to ", client.remote_address)
         except:
             print(f"OLD client client ({client.remote_address}) no longer available removing it")
