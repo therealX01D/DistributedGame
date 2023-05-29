@@ -109,9 +109,9 @@ async def handler(ws, path):
             print(f"GAME NOT READY YET , {curr_players}/{max_players} joined")
             connected_clients_IPs.add(ws.remote_address[0])
             username = loaded_jsn_mssg["username"]
-            print(f" dict{loaded_jsn_mssg} : username is :{loaded_jsn_mssg['username']}")
+            print(f"username is :{loaded_jsn_mssg['username']}")
             IP = ws.remote_address[0]
-            print(f"IP address is {type(IP)}")
+            #TODO : IP + PORT => username
             IP__username[IP] = username
             username__id[username] = curr_players
             playerCarId = json.dumps({"carID": curr_players})

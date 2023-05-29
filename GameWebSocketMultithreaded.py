@@ -15,7 +15,7 @@ kbtEV = threading.Event()
 wsEV = threading.Event()
 guiEV = threading.Event()
 GameStatus = None
-
+STOP = 0
 
 ##GAME ASSETS
 GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
@@ -99,6 +99,12 @@ arr_players_class = [player1,player2]
 def kbthread():
     while 1:
         kbtEV.wait()
+        # TODO : a try to fix window issue
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                global STOP
+                STOP = 1
+                break
         print(f"KB THREAD..")
         global kbbtns
         kbbtns = ""
@@ -128,6 +134,7 @@ def kbthread():
         print("MOVEMENT : ",type(movement),"->" , movement)
         WS.send(movement)
         kbtEV.clear()
+        # time.sleep(0.04) #too slow
 
 
 
@@ -140,6 +147,12 @@ def on_open(ws):
     ws.send(UN)
 
 def on_message(ws, message):
+    # TODO : a try to fix window issue
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            global STOP
+            STOP = 1
+            break
     kbtEV.clear()
     print('(ON MESSAGE) ..S')
     print(f"[Received From Server] {message}")
@@ -185,12 +198,13 @@ def on_message(ws, message):
     #TODO: If there are problems when connecting lots of players
     # DUE TO LOTS OF MESSAGES FROM EVERYONE
     # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
-    #time.sleep(0.001)
 
     pygame.display.update()  # update screen
     print(f"(ON MESSAGE) ..E")
     print("setted GUI ev")
     kbtEV.set()
+    # time.sleep(0.01) # I think useless
+
 
 
 def on_error(ws, error):
@@ -219,10 +233,14 @@ def s():
     kbt = threading.Thread(target=kbthread)
     print("Starting kbthread")
     kbt.start()
+    kbt.join()
+    wst.join()
     # pygamethread = threading.Thread(target=GUI())
     # pygamethread.start()
 
     while 1:
+        if STOP:
+            break
         ws.run_forever()
         print("RECONNECTING")
 
