@@ -86,8 +86,8 @@ class PlayerCar(AbstractCar):
         super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
         self.CarID = CarID
         self.StartPos = StartPos
-        IMG = CAR_IMGS[CarID]
-        START_POS = StartPos #use self.x better
+        self.IMG = CAR_IMGS[CarID]
+        self.START_POS = StartPos #use self.x better
 
 player1 = PlayerCar(4,4,0,(180,250)) #RED
 player2 = PlayerCar(4,4,1,(170,250)) #GREEN
