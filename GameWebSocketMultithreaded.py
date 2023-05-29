@@ -169,7 +169,7 @@ def on_message(ws, message):
             print("GLOBAL GAME STATUS CHANGING ....")
             DrawImages(WIN, myimages)
             print("BEFORE UPD DISPLAY")
-            pygame.display.update()  # update screen
+            # pygame.display.update()  # update screen
             print("UPDATE DISPLAY")
             for key in gameStatus:
                 player_id = int(key)
@@ -181,7 +181,7 @@ def on_message(ws, message):
                 print(f"[player C] :{type(arr_players_class[player_id])}")
                 DrawCar(WIN,arr_players_class[player_id])
                 print("[[Game status changed]]")
-            pygame.display.update()  # update screen
+                pygame.display.update()  # update screen
     #TODO: If there are problems when connecting lots of players
     # DUE TO LOTS OF MESSAGES FROM EVERYONE
     # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
