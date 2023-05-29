@@ -182,6 +182,10 @@ def on_message(ws, message):
                 DrawCar(WIN,arr_players_class[player_id])
                 print("[[Game status changed]]")
             pygame.display.update()  # update screen
+    #TODO: If there are problems when connecting lots of players
+    # DUE TO LOTS OF MESSAGES FROM EVERYONE
+    # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
+    #time.sleep(0.001)
 
     pygame.display.update()  # update screen
     print(f"(ON MESSAGE) ..E")
