@@ -8,8 +8,8 @@ import json
 # max_players = int(input("ENTER NUMBER OF MAX PLAYERS"))
 max_players = 1
 curr_players  =0
-IPADDRESS = "localhost"
-PORT = 1761
+IPADDRESS = "35.158.206.2"
+PORT = 80
 connected_clients_IPs = set()
 connected_clients_WSs = set()
 users = set()
@@ -23,6 +23,16 @@ GREY_CAR = Helpers.scaleImage(pygame.image.load("imgs/grey-car.png"),0.3,0.3)
 PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"),0.3,0.3)
 CAR_IMGS = [RED_CAR,GREEN_CAR,GREY_CAR,PURPLE_CAR]
 
+GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
+TRACK = pygame.image.load("imgs/track.png")
+FINISH= Helpers.scaleImage(pygame.image.load("imgs/finish.png"),0.9,0.9)
+TRACK_BORDER = Helpers.scaleImage(pygame.image.load("imgs/track-border.png"),1,1)
+TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER)
+
+
+FINISH = pygame.image.load("imgs/finish.png")
+FINISH_MASK = pygame.mask.from_surface(FINISH)
+FINISH_POSITION = (140, 250)
 
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
@@ -52,16 +62,27 @@ class AbstractCar:
         self.move()
 
     def move_backward(self):
-        self.vel = max(self.vel - self.acceleration, -self.max_vel) #threshold is max_vel
+        self.vel = max(self.vel - self.acceleration, -self.max_vel/2) #threshold is max_vel
         self.move()
 
     def reduce_speed(self):
         if self.vel>0:
-            self.vel = max(self.vel - self.acceleration / 4, 0)
+            self.vel = max(self.vel - self.acceleration / 2, 0)
 
         if self.vel<0:
-            self.vel = min(self.vel + self.acceleration / 4, 0)
+            self.vel = min(self.vel + self.acceleration / 2, 0)
         self.move()
+    def collide(self,mask,x=0,y=0):
+        car_mask =  pygame.mask.from_surface(self.img)
+        offset = (int(self.x - x),int(self.y - y))
+        poi = mask.overlap(car_mask,offset)
+        return poi
+
+    def reset(self):
+        self.x, self.y = self.START_POS
+        self.angle = 0
+        self.vel = 0
+
 
 #each player in game will have this class
 class PlayerCar(AbstractCar):
@@ -72,7 +93,11 @@ class PlayerCar(AbstractCar):
         self.CarID = CarID
         self.StartPos = StartPos
         IMG = CAR_IMGS[CarID]
-        START_POS = StartPos #use self.x better
+        self.img = IMG
+        START_POS = StartPos #use self.x
+    def bounce(self):
+        self.vel = -self.vel/1.8
+        self.move()
 player1 = PlayerCar(4,4,0,(180,250))
 player2 = PlayerCar(4,4,1,(170,250))
 arr_players_class = [player1,player2]
@@ -169,6 +194,16 @@ def processMovement(ws,message):
         REDUCE = False
     if  REDUCE or message=="NULL":
         mover_player_car.reduce_speed()
+
+    if mover_player_car.collide(TRACK_BORDER_MASK) != None :
+        mover_player_car.bounce()
+    finish_poi_collide = mover_player_car.collide(FINISH_MASK, *FINISH_POSITION)
+    if finish_poi_collide != None:
+        if finish_poi_collide[1] == 0:
+            mover_player_car.bounce()
+        else:
+            mover_player_car.reset()
+            print("finish")
     print("processed movement")
     print("GOING TO prepare game status")
 

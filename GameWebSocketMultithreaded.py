@@ -1,5 +1,4 @@
 #CLIENT
-import asyncio
 import json
 carID = -1
 kbbtns = "NULL"
@@ -7,21 +6,26 @@ import websocket
 import pygame
 import threading
 import keyboard
-import time
 import Helpers
 import math
+SCREEN = pygame.display.set_mode((1280, 720))
+
 WS = None
 kbtEV = threading.Event()
 wsEV = threading.Event()
 guiEV = threading.Event()
+kbtEV.set()
+wsEV.set()
 GameStatus = None
 STOP = 0
-
+import os , signal
 ##GAME ASSETS
 GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
 TRACK = pygame.image.load("imgs/track.png")
-FINISH= Helpers.scaleImage(pygame.image.load("imgs/finish.png"),0.9,0.9)
-TRACK_BORDER = Helpers.scaleImage(pygame.image.load("imgs/track-border.png"),0.9,0.9)
+FINISH= Helpers.scaleImage(pygame.image.load("imgs/finish.png"),0.8,0.8)
+FINISH_MASK = pygame.mask.from_surface(FINISH)
+FINISH_POSITION = (156, 250)
+TRACK_BORDER = Helpers.scaleImage(pygame.image.load("imgs/track-border.png"),1,1)
 
 RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
 GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"),0.3,0.3)
@@ -30,7 +34,21 @@ PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"),0.3,0.3
 CAR_IMGS = [RED_CAR,GREEN_CAR,GREY_CAR,PURPLE_CAR]
 WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-myimages = [(GRASS,(0,0)),(TRACK,(0,0)),(FINISH,(0,0))]
+myimages = [(GRASS,(0,0)),(TRACK,(0,0)),(FINISH,FINISH_POSITION)]
+
+
+
+def close():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            for i in range(10):
+                print("HEEEEEEEEEEEEREEEEEEEEEE")
+                #TODO : WHY NEVER REACH HERE
+            global STOP
+            STOP = 1
+            pid = os.getgid()
+            os.kill(pid, signal.SIGKILL)
+            break
 
 def DrawImages(win,images):
     for image,pos in images:
@@ -95,16 +113,11 @@ arr_players_class = [player1,player2]
 
 ##END OF ASSETS
 
-
 def kbthread():
     while 1:
         kbtEV.wait()
         # TODO : a try to fix window issue
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                global STOP
-                STOP = 1
-                break
+        close()
         print(f"KB THREAD..")
         global kbbtns
         kbbtns = ""
@@ -136,8 +149,6 @@ def kbthread():
         kbtEV.clear()
         # time.sleep(0.04) #too slow
 
-
-
 # username = input("ENTER : USERNAME")
 username = "oaayoub"
 server = 'ws://localhost:1761'
@@ -148,15 +159,12 @@ def on_open(ws):
 
 def on_message(ws, message):
     # TODO : a try to fix window issue
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            global STOP
-            STOP = 1
-            break
+    wsEV.wait()
+
     kbtEV.clear()
     print('(ON MESSAGE) ..S')
     print(f"[Received From Server] {message}")
-
+    close()
     try:
         loaded_jsn_msg = json.loads(message)
     except:
@@ -179,11 +187,7 @@ def on_message(ws, message):
             print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
             global GameStatus
             GameStatus = gameStatus
-            print("GLOBAL GAME STATUS CHANGING ....")
             DrawImages(WIN, myimages)
-            print("BEFORE UPD DISPLAY")
-            # pygame.display.update()  # update screen
-            print("UPDATE DISPLAY")
             for key in gameStatus:
                 player_id = int(key)
                 print(f"key({key}) player{player_id} :> status {gameStatus[key]}")
@@ -194,18 +198,15 @@ def on_message(ws, message):
                 print(f"[player C] :{type(arr_players_class[player_id])}")
                 DrawCar(WIN,arr_players_class[player_id])
                 print("[[Game status changed]]")
-                pygame.display.update()  # update screen
+            print(f"display updated")
+            pygame.display.update()  # update screen
     #TODO: If there are problems when connecting lots of players
     # DUE TO LOTS OF MESSAGES FROM EVERYONE
     # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
 
     pygame.display.update()  # update screen
     print(f"(ON MESSAGE) ..E")
-    print("setted GUI ev")
     kbtEV.set()
-    # time.sleep(0.01) # I think useless
-
-
 
 def on_error(ws, error):
     print("*Error*", error)
@@ -216,8 +217,6 @@ def on_close(wsa, close_status_code, close_msg="close"):
     wsa.send(close_msg)
     print("Connection closing")
 
-
-# async def main(future):
 def s():
     pygame.init()
     global WS
@@ -235,17 +234,11 @@ def s():
     kbt.start()
     kbt.join()
     wst.join()
-    # pygamethread = threading.Thread(target=GUI())
-    # pygamethread.start()
-
+    pygame.quit()
     while 1:
         if STOP:
             break
         ws.run_forever()
         print("RECONNECTING")
 
-
-# if __name__ == "__main__":
-#     asyncio.run(main())
 s()
-
