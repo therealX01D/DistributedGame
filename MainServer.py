@@ -5,11 +5,15 @@ import pygame
 import Helpers
 import math
 import json
+import socket
 # max_players = int(input("ENTER NUMBER OF MAX PLAYERS"))
 max_players = 1
 curr_players  =0
-IPADDRESS = "35.158.206.2"
-PORT = 80
+IPADDRESS = "0.0.0.0"
+print("IP ADDRESS" , IPADDRESS)
+
+
+PORT = 17611
 connected_clients_IPs = set()
 connected_clients_WSs = set()
 users = set()
@@ -220,9 +224,7 @@ def prepareGameStatus():
     print(f"gamestaus ready to broadcast : {gameStatus}")
     global GS
     GS = gameStatus
-    #send game status to everyone
-    # broadcast(DumpedGameStatus)
-    # print("Broadcasted game status")
+
 
 async def broadcast(message):
     # Iterate over all connected clients and send the message

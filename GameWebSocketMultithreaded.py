@@ -8,14 +8,16 @@ import threading
 import keyboard
 import Helpers
 import math
+import socket
+import time
 SCREEN = pygame.display.set_mode((1280, 720))
 
 WS = None
 kbtEV = threading.Event()
 wsEV = threading.Event()
 guiEV = threading.Event()
-kbtEV.set()
-wsEV.set()
+kbtEV.clear()
+wsEV.clear()
 GameStatus = None
 STOP = 0
 import os , signal
@@ -112,7 +114,6 @@ player2 = PlayerCar(4,4,1,(170,250)) #GREEN
 arr_players_class = [player1,player2]
 
 ##END OF ASSETS
-
 def kbthread():
     while 1:
         kbtEV.wait()
@@ -146,21 +147,23 @@ def kbthread():
         movement = json.dumps({"movement":kbbtns})
         print("MOVEMENT : ",type(movement),"->" , movement)
         WS.send(movement)
+        time.sleep(0.04)
         kbtEV.clear()
-        # time.sleep(0.04) #too slow
-
 # username = input("ENTER : USERNAME")
 username = "oaayoub"
-server = 'ws://localhost:1761'
+ip = socket.gethostname()
+server = 'ws://35.158.206.2:17611'
 def on_open(ws):
+    kbtEV.clear()
+    wsEV.clear()
+
     print("Connection opened")
     UN = json.dumps({"username":username})
     ws.send(UN)
-
+    kbtEV.set()
+    wsEV.set()
 def on_message(ws, message):
     # TODO : a try to fix window issue
-    wsEV.wait()
-
     kbtEV.clear()
     print('(ON MESSAGE) ..S')
     print(f"[Received From Server] {message}")
