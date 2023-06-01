@@ -242,7 +242,7 @@ async def broadcast(message):
 startServer = websockets.serve(handler, IPADDRESS, PORT)
 
 async def main():
-    async with websockets.serve(handler, "localhost", PORT):
+    async with websockets.serve(handler, IPADDRESS, PORT):
         await asyncio.Future()  # run forever
 
 asyncio.run(main())

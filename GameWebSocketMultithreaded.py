@@ -152,7 +152,7 @@ def kbthread():
 # username = input("ENTER : USERNAME")
 username = "oaayoub"
 ip = socket.gethostname()
-server = 'ws://35.158.206.2:17611'
+server = 'ws://35.158.245.102:17611'
 def on_open(ws):
     kbtEV.clear()
     wsEV.clear()
