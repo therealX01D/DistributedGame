@@ -123,23 +123,23 @@ def kbthread():
         global kbbtns
         kbbtns = ""
         if keyboard.is_pressed("a"):
-            kbbtns = "left"
+            kbbtns = "l"
 
         if keyboard.is_pressed("d"):
             if(len(kbbtns)):
-               kbbtns += "," + "right"
+               kbbtns += "," + "r"
             else:
-                kbbtns = "right"
+                kbbtns = "r"
         if keyboard.is_pressed("s"):
             if (len(kbbtns)):
-                kbbtns += "," + "down"
+                kbbtns += "," + "d"
             else:
-                kbbtns = "down"
+                kbbtns = "d"
         if keyboard.is_pressed("w"):
             if (len(kbbtns)):
-                kbbtns += "," + "up"
+                kbbtns += "," + "u"
             else:
-                kbbtns = "up"
+                kbbtns = "u"
         print("THERE")
         if(kbbtns == ""):
             kbbtns = "NULL"
