@@ -7,7 +7,7 @@ import math
 import json
 import socket
 # max_players = int(input("ENTER NUMBER OF MAX PLAYERS"))
-max_players = 1
+max_players = int(input("ENTER MAX_PLAYERS"))
 curr_players  =0
 IPADDRESS = "0.0.0.0"
 print("IP ADDRESS" , IPADDRESS)
