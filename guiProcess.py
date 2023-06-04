@@ -80,7 +80,6 @@ def guiP():
         def __init__(self, max_vel, rotation_vel, CarID,StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
             self.CarID = CarID
             self.StartPos = StartPos
-            self.IMG = CAR_IMGS[CarID]
             self.START_POS = StartPos  # use self.x better
             super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
 
