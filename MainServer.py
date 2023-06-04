@@ -144,8 +144,8 @@ async def handler(ws, path):
             IP__username[IP] = username
             username__id[username] = curr_players
             playerCarId = json.dumps({"carID": curr_players})
-            curr_players=curr_players+1
             await ws.send(playerCarId)
+            curr_players=curr_players+1
             #add player to the game
             if curr_players == max_players:
                 print(" Broadcasting 'READY'....")
