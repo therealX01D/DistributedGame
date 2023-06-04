@@ -35,4 +35,4 @@ def kbP():
         movement = json.dumps({"movement":kbbtns})
         print("MOVEMENT : ", movement)
         pusher.send_string(movement)
-        time.sleep(0.01)
+        time.sleep(0.1)
