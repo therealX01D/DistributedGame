@@ -94,9 +94,11 @@ class PlayerCar(AbstractCar):
     def __init__(self, max_vel, rotation_vel, CarID,StartPos):
         super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
         self.CarID = CarID
-        self.StartPos = StartPos
-        self.IMG = CAR_IMGS[CarID]
-        START_POS = StartPos #use self.x
+        # self.StartPos = StartPos
+        self.img = CAR_IMGS[CarID]
+        # START_POS = StartPos #use self.x
+        self.x = StartPos[0]
+        self.y = StartPos[1]
     def bounce(self):
         self.vel = -self.vel/1.6
         self.move()
