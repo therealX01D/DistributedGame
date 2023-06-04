@@ -216,6 +216,7 @@ def processMovement(id,message):
 
 def prepareGameStatus():
     # Iterate over all connected clients and send the message
+    global  arr_players_class
     playerStatus = {}
     for i in range(max_players):
         p = arr_players_class[i]
