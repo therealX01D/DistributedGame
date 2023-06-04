@@ -8,6 +8,7 @@ WS = None
 carID = -1 #TODO : WHAT ?
 pusher = None
 dicitonary = read_dictionary_from_file()
+READY = False
 
 def on_open(ws):
     print("Connection opened")
@@ -29,6 +30,8 @@ def on_message(ws, message): #recieve
     if isinstance(loaded_jsn_msg, str):
         if message == "READY":
             print("I GOT 'READY' message..")
+            global READY
+            READY = True
 
     if isinstance(loaded_jsn_msg, dict):
         print("ITS DICT")
@@ -58,14 +61,15 @@ def on_close(wsa, close_status_code, close_msg="close"):
 
 def sendMovementThread():
     print("Send movement thread")
-    global WS
+    global WS , READY
     context = zmq.Context()
     puller = context.socket(zmq.PULL)
     KeyboardPort = dicitonary["keyboardPort"]
     puller.connect("tcp://localhost:"+str(KeyboardPort))
     while True:
         movement = puller.recv_string()
-        WS.send(movement)
+        if READY:
+            WS.send(movement)
 
 
 def wsP():
