@@ -82,7 +82,7 @@ def guiP():
             super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
 
 
-    player1 = PlayerCar(4, 4, 2, (180, 260))  # RED
+    player1 = PlayerCar(4, 4, 0, (180, 260))  # RED
     player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
     arr_players_class = [player1, player2]
 
