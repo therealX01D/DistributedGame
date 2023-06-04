@@ -46,7 +46,7 @@ class AbstractCar:
         self.vel = 0
         self.rotation_vel = rotation_vel
         self.angle = 0
-        self.x, self.y = (0,0)
+        self.x, self.y = self.START_POS
         self.acceleration = 0.05
 
     def rotate(self, left=False, right=False):
@@ -95,7 +95,7 @@ class PlayerCar(AbstractCar):
                  StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
         self.CarID = CarID
         self.IMG = CAR_IMGS[CarID]
-        self.START_POS = StartPos  # use self.x better
+        self.START_POS = StartPos
         super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
     def bounce(self):
         self.vel = -self.vel/1.6
