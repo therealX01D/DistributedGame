@@ -143,6 +143,7 @@ async def handler(ws, path):
             #TODO : IP + PORT => username
             IP__username[IP] = username
             username__id[username] = curr_players
+            print(f"{username} : given ID :{curr_players} ")
             playerCarId = json.dumps({"carID": curr_players})
             await ws.send(playerCarId)
             curr_players=curr_players+1
@@ -158,7 +159,7 @@ async def handler(ws, path):
 
 
         elif curr_players>=max_players and registered_before:
-            print(f"GAME READY AND RECIEVED SOMETHING FROM OLD USER :/ , {message}")
+            print(f"GAME READY AND RECIEVED SOMETHING FROM {username__id[IP__username[ws.remote_address[0]]]} , {message}")
             if type(loaded_jsn_mssg) == str:
                 loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
             if "movement" in loaded_jsn_mssg.keys():
@@ -220,7 +221,6 @@ def prepareGameStatus():
     print("Prepared and Will BROADCASTING GAME STATUS... ")
 
     gameStatus = {'game' : playerStatus}
-    DumpedGameStatus = json.dumps(gameStatus)
     print(f"gamestaus ready to broadcast : {gameStatus}")
     global GS
     GS = gameStatus
