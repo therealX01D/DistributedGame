@@ -91,17 +91,19 @@ class AbstractCar:
 
 #each player in game will have this class
 class PlayerCar(AbstractCar):
-    # IMG = RED_CAR
-    # START_POS = (180, 200)
+    IMG = RED_CAR
+    START_POS = (180, 200)
     def __init__(self, max_vel, rotation_vel, CarID,StartPos):
         super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
         self.CarID = CarID
         self.StartPos = StartPos
         IMG = CAR_IMGS[CarID]
         self.img = IMG
+        START_POS = StartPos #use self.x
     def bounce(self):
-        self.vel = -self.vel/1.8
+        self.vel = -self.vel/1.6
         self.move()
+        
 player1 = PlayerCar(4,4,0,(180,250))
 player2 = PlayerCar(4,4,1,(170,250))
 arr_players_class = [player1,player2]
