@@ -41,7 +41,7 @@ FINISH_POSITION = (140, 250)
 
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
-        # self.img = self.IMG
+        self.img = self.IMG
         self.max_vel = max_vel
         self.vel = 0
         self.rotation_vel = rotation_vel
