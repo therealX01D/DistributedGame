@@ -137,14 +137,14 @@ async def handler(ws, path):
             connected_clients_WSs.add(ws)
             print(f"GAME NOT READY YET , {curr_players}/{max_players} joined")
             connected_clients_IPs.add(ws.remote_address[0])
-            print(f"username is :{loaded_jsn_mssg['username']}")
-            #TODO : IP + PORT => username
             username = loaded_jsn_mssg["username"]
+            print(f"username is :{loaded_jsn_mssg['username']}")
             IP = ws.remote_address[0]
+            #TODO : IP + PORT => username
             IP__username[IP] = username
             username__id[username] = curr_players
-            curr_players=curr_players+1
             playerCarId = json.dumps({"carID": curr_players})
+            curr_players=curr_players+1
             await ws.send(playerCarId)
             #add player to the game
             if curr_players == max_players:
@@ -158,11 +158,7 @@ async def handler(ws, path):
 
 
         elif curr_players>=max_players and registered_before:
-            username = loaded_jsn_mssg["username"]
-            IP = ws.remote_address[0]
-            IP__username[IP] = username
-
-            print(f"GAME READY AND RECIEVED MOVEMENT , {message}")
+            print(f"GAME READY AND RECIEVED SOMETHING FROM OLD USER :/ , {message}")
             if type(loaded_jsn_mssg) == str:
                 loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
             if "movement" in loaded_jsn_mssg.keys():
