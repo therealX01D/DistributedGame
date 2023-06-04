@@ -103,7 +103,7 @@ class PlayerCar(AbstractCar):
     def bounce(self):
         self.vel = -self.vel/1.6
         self.move()
-        
+
 player1 = PlayerCar(4,4,0,(180,250))
 player2 = PlayerCar(4,4,1,(170,250))
 arr_players_class = [player1,player2]
@@ -183,7 +183,7 @@ def processMovement(id,message):
     print(f"[Received From Client]: {message}")
 
     #change game status
-
+    global arr_players_class
     mover_player_car = arr_players_class[id]
     movements = message.split(",")
     REDUCE = True
@@ -210,6 +210,7 @@ def processMovement(id,message):
         else:
             mover_player_car.reset()
             print("finish")
+    arr_players_class[id] = mover_player_car
     print("processed movement")
     print("GOING TO prepare game status")
 
