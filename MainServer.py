@@ -91,20 +91,18 @@ class AbstractCar:
 
 #each player in game will have this class
 class PlayerCar(AbstractCar):
-    def __init__(self, max_vel, rotation_vel, CarID,StartPos):
-        super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
+    def __init__(self, max_vel, rotation_vel, CarID,
+                 StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
         self.CarID = CarID
-        # self.StartPos = StartPos
-        self.img = CAR_IMGS[CarID]
-        # START_POS = StartPos #use self.x
-        self.x = StartPos[0]
-        self.y = StartPos[1]
+        self.IMG = CAR_IMGS[CarID]
+        self.START_POS = StartPos  # use self.x better
+        super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
     def bounce(self):
         self.vel = -self.vel/1.6
         self.move()
 
-player1 = PlayerCar(4,4,0,(180,250))
-player2 = PlayerCar(4,4,1,(170,250))
+player1 = PlayerCar(4,4,0,(180,270))
+player2 = PlayerCar(4,4,1,(170,270))
 arr_players_class = [player1,player2]
 ##END: PYGAME ASSETS
 
