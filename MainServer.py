@@ -179,11 +179,10 @@ async def handler(ws, path):
 
 
 def processMovement(id,message):
-    print("processing movement.. UwU")
-    print(f"[Received From Client]: {message}")
-
+    print("processing movement.. ")
     #change game status
     global arr_players_class
+    print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
     mover_player_car = arr_players_class[id]
     movements = message.split(",")
     REDUCE = True
@@ -211,6 +210,8 @@ def processMovement(id,message):
             mover_player_car.reset()
             print("finish")
     arr_players_class[id] = mover_player_car
+    print(f"new xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
+
     print("processed movement")
     print("GOING TO prepare game status")
 
@@ -221,7 +222,7 @@ def prepareGameStatus():
     for i in range(max_players):
         p = arr_players_class[i]
         playerStatus[str(i)] = {'posx': p.x ,'posy': p.y ,'angle' : p.angle}
-    print("Prepared and Will BROADCASTING GAME STATUS... ")
+    print("Prepared ... ")
 
     gameStatus = {'game' : playerStatus}
     print(f"gamestaus ready to broadcast : {gameStatus}")
