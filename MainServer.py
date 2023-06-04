@@ -91,14 +91,11 @@ class AbstractCar:
 
 #each player in game will have this class
 class PlayerCar(AbstractCar):
-    IMG = RED_CAR
-    START_POS = (180, 200)
     def __init__(self, max_vel, rotation_vel, CarID,StartPos):
         super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
         self.CarID = CarID
         self.StartPos = StartPos
-        IMG = CAR_IMGS[CarID]
-        self.img = IMG
+        self.IMG = CAR_IMGS[CarID]
         START_POS = StartPos #use self.x
     def bounce(self):
         self.vel = -self.vel/1.6
@@ -168,7 +165,7 @@ async def handler(ws, path):
                 loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
             if "movement" in loaded_jsn_mssg.keys():
                 movs = loaded_jsn_mssg["movement"]
-                print("IT's a movement :) ")
+                print("IT's a movement")
                 processMovement(carid,movs)
                 prepareGameStatus()
                 await ws.send(json.dumps(GS))
@@ -185,16 +182,17 @@ def processMovement(id,message):
     print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
     mover_player_car = arr_players_class[id]
     movements = message.split(",")
+    print("moves = ",movements)
     REDUCE = True
-    if "left" in movements:
+    if "l" in movements:
         mover_player_car.rotate(left=1)
-    if "right" in movements:
+    if "r" in movements:
         mover_player_car.rotate(right=1)
 
-    if "up" in movements:
+    if "u" in movements:
         mover_player_car.move_forward()
         REDUCE = False
-    if "down" in movements:
+    if "d" in movements:
         mover_player_car.move_backward()
         REDUCE = False
     if  REDUCE or message=="NULL":
