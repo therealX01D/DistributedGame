@@ -15,6 +15,7 @@ print("IP ADDRESS" , IPADDRESS)
 
 PORT = 17611
 connected_clients_IPs = set()
+connected_clients_UNs = set()
 connected_clients_WSs = set()
 users = set()
 IP__username = {}
@@ -38,6 +39,7 @@ FINISH = pygame.image.load("imgs/finish.png")
 FINISH_MASK = pygame.mask.from_surface(FINISH)
 FINISH_POSITION = (140, 250)
 
+
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
         self.img = self.IMG
@@ -56,52 +58,45 @@ class AbstractCar:
 
     def move(self):
         rad = math.radians(-self.angle)
-        vertical_v = -math.cos(rad)*self.vel
-        horizontal_v = math.sin(rad)*self.vel
+        vertical_v = -math.cos(rad) * self.vel
+        horizontal_v = math.sin(rad) * self.vel
         self.x += horizontal_v
         self.y += vertical_v
 
     def move_forward(self):
-        self.vel = min(self.vel + self.acceleration, self.max_vel) #threshold is max_vel
+        self.vel = min(self.vel + self.acceleration, self.max_vel)  # threshold is max_vel
         self.move()
 
     def move_backward(self):
-        self.vel = max(self.vel - self.acceleration, -self.max_vel/2) #threshold is max_vel
+        self.vel = max(self.vel - self.acceleration, -self.max_vel)  # threshold is max_vel
         self.move()
 
     def reduce_speed(self):
-        if self.vel>0:
-            self.vel = max(self.vel - self.acceleration / 2, 0)
+        if self.vel > 0:
+            self.vel = max(self.vel - self.acceleration / 4, 0)
 
-        if self.vel<0:
-            self.vel = min(self.vel + self.acceleration / 2, 0)
+        if self.vel < 0:
+            self.vel = min(self.vel + self.acceleration / 4, 0)
         self.move()
-    def collide(self,mask,x=0,y=0):
-        car_mask =  pygame.mask.from_surface(self.img)
-        offset = (int(self.x - x),int(self.y - y))
-        poi = mask.overlap(car_mask,offset)
-        return poi
-
-    def reset(self):
-        self.x, self.y = self.START_POS
-        self.angle = 0
-        self.vel = 0
 
 
-#each player in game will have this class
 class PlayerCar(AbstractCar):
-    IMG = RED_CAR
-    START_POS = (180, 200)
-    def __init__(self, max_vel, rotation_vel, CarID,StartPos):
-        super().__init__( max_vel, rotation_vel)  # Call the parent class constructor
+    # IMG = GREY_CAR
+    # START_POS = (180, 200)
+
+    def __init__(self, max_vel, rotation_vel, CarID,
+        StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
         self.CarID = CarID
         self.StartPos = StartPos
-        IMG = CAR_IMGS[CarID]
-        self.img = IMG
-        START_POS = StartPos #use self.x
+        self.IMG = CAR_IMGS[CarID]
+        self.START_POS = StartPos  # use self.x better
+        super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
     def bounce(self):
-        self.vel = -self.vel/1.8
+        self.vel = -self.vel/1.6
         self.move()
+
+
+
 player1 = PlayerCar(4,4,0,(180,250))
 player2 = PlayerCar(4,4,1,(170,250))
 arr_players_class = [player1,player2]
@@ -145,8 +140,8 @@ async def handler(ws, path):
             username__id[username] = curr_players
             print(f"{username} : given ID :{curr_players} ")
             playerCarId = json.dumps({"carID": curr_players})
-            await ws.send(playerCarId)
             curr_players=curr_players+1
+            await ws.send(playerCarId)
             #add player to the game
             if curr_players == max_players:
                 print(" Broadcasting 'READY'....")
@@ -154,19 +149,20 @@ async def handler(ws, path):
 
         elif curr_players>=max_players and not registered_before:
             print(f"GAME READY AND YOU ARE NOT INVITED :( ")
-            ER_MSG = json.dumps({"ERROR" : "GameFull!"})
+            ER_MSG = json.dumps({"ERROR": "GameFull!"})
             ws.send(ER_MSG)
 
 
+
         elif curr_players>=max_players and registered_before:
-            print(f"GAME READY AND RECIEVED SOMETHING FROM {username__id[IP__username[ws.remote_address[0]]]} , {message}")
+            carid = username__id[IP__username[ws.remote_address[0]]]
+            print(f"GAME READY /RECIEVED FROM ID: {carid} -> {message}")
             if type(loaded_jsn_mssg) == str:
                 loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
             if "movement" in loaded_jsn_mssg.keys():
                 movs = loaded_jsn_mssg["movement"]
                 print("IT's a movement :) ")
-                print(f"type {type(movs)} , {movs}")
-                processMovement(ws,movs)
+                processMovement(carid,movs)
                 prepareGameStatus()
                 await ws.send(json.dumps(GS))
 
@@ -175,15 +171,12 @@ async def handler(ws, path):
                     await ws.send("READY")
 
 
-def processMovement(ws,message):
+def processMovement(id,message):
     print("processing movement.. UwU")
     print(f"[Received From Client]: {message}")
 
     #change game status
-    IP = ws.remote_address[0]
-    mover_username = IP__username[IP]
-    mover_car_id = username__id[mover_username]
-    mover_player_car = arr_players_class[mover_car_id]
+    mover_player_car = arr_players_class[id]
     movements = message.split(",")
     REDUCE = True
     if "left" in movements:

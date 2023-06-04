@@ -10,6 +10,30 @@ dictionary = read_dictionary_from_file()
 def guiP():
     import math
     import Helpers
+  ##GAME ASSETS
+    GRASS = scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
+    TRACK = pygame.image.load("imgs/track.png")
+    FINISH = scaleImage(pygame.image.load("imgs/finish.png"), 0.8, 0.8)
+    FINISH_POSITION = (156, 250)
+
+    RED_CAR = scaleImage(pygame.image.load("imgs/red-car.png"), 0.3, 0.3)
+    GREEN_CAR = scaleImage(pygame.image.load("imgs/green-car.png"), 0.3, 0.3)
+    GREY_CAR = scaleImage(pygame.image.load("imgs/grey-car.png"), 0.3, 0.3)
+    PURPLE_CAR = scaleImage(pygame.image.load("imgs/purple-car.png"), 0.3, 0.3)
+    CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR]
+    WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
+    WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    myimages = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, FINISH_POSITION)]
+
+    def DrawImages(win, images):
+        for image, pos in images:
+            WIN.blit(image, pos)
+
+    def DrawCar(win, player_car):
+        player_car.draw(win)
+
+    # each player in game will have this class
     class AbstractCar:
         def __init__(self, max_vel, rotation_vel):
             self.img = self.IMG
@@ -48,30 +72,7 @@ def guiP():
             if self.vel < 0:
                 self.vel = min(self.vel + self.acceleration / 4, 0)
             self.move()
-    ##GAME ASSETS
-    GRASS = scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
-    TRACK = pygame.image.load("imgs/track.png")
-    FINISH = scaleImage(pygame.image.load("imgs/finish.png"), 0.8, 0.8)
-    FINISH_POSITION = (156, 250)
 
-    RED_CAR = scaleImage(pygame.image.load("imgs/red-car.png"), 0.3, 0.3)
-    GREEN_CAR = scaleImage(pygame.image.load("imgs/green-car.png"), 0.3, 0.3)
-    GREY_CAR = scaleImage(pygame.image.load("imgs/grey-car.png"), 0.3, 0.3)
-    PURPLE_CAR = scaleImage(pygame.image.load("imgs/purple-car.png"), 0.3, 0.3)
-    CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR]
-    WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
-    WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-
-    myimages = [(GRASS, (0, 0)), (TRACK, (0, 0)), (FINISH, FINISH_POSITION)]
-
-    def DrawImages(win, images):
-        for image, pos in images:
-            WIN.blit(image, pos)
-
-    def DrawCar(win, player_car):
-        player_car.draw(win)
-
-    # each player in game will have this class
     class PlayerCar(AbstractCar):
         # IMG = GREY_CAR
         # START_POS = (180, 200)
