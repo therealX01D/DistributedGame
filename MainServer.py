@@ -101,8 +101,8 @@ class PlayerCar(AbstractCar):
         self.vel = -self.vel/1.6
         self.move()
 
-player1 = PlayerCar(4,4,0,(200,280))
-player2 = PlayerCar(4,4,1,(170,280))
+player1 = PlayerCar(4,4,0,(180,230))
+player2 = PlayerCar(4,4,1,(170,230))
 arr_players_class = [player1,player2]
 ##END: PYGAME ASSETS
 
