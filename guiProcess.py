@@ -1,21 +1,58 @@
 import pygame
 from Helpers import *
 import zmq
-import abstractcar
 import json
-import eventScript
+from ReadFromDict import *
 
+dictionary = read_dictionary_from_file()
 
 
 def guiP():
-    carID = -1
+    import math
+    import Helpers
+    class AbstractCar:
+        def __init__(self, max_vel, rotation_vel):
+            self.img = self.IMG
+            self.max_vel = max_vel
+            self.vel = 0
+            self.rotation_vel = rotation_vel
+            self.angle = 0
+            self.x, self.y = self.START_POS
+            self.acceleration = 0.05
+
+        def rotate(self, left=False, right=False):
+            self.angle += left * 2 + right * -2
+
+        def draw(self, win):
+            Helpers.blit_rotate_center(win, self.img, (self.x, self.y), self.angle)
+
+        def move(self):
+            rad = math.radians(-self.angle)
+            vertical_v = -math.cos(rad) * self.vel
+            horizontal_v = math.sin(rad) * self.vel
+            self.x += horizontal_v
+            self.y += vertical_v
+
+        def move_forward(self):
+            self.vel = min(self.vel + self.acceleration, self.max_vel)  # threshold is max_vel
+            self.move()
+
+        def move_backward(self):
+            self.vel = max(self.vel - self.acceleration, -self.max_vel)  # threshold is max_vel
+            self.move()
+
+        def reduce_speed(self):
+            if self.vel > 0:
+                self.vel = max(self.vel - self.acceleration / 4, 0)
+
+            if self.vel < 0:
+                self.vel = min(self.vel + self.acceleration / 4, 0)
+            self.move()
     ##GAME ASSETS
     GRASS = scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
     TRACK = pygame.image.load("imgs/track.png")
     FINISH = scaleImage(pygame.image.load("imgs/finish.png"), 0.8, 0.8)
-    FINISH_MASK = pygame.mask.from_surface(FINISH)
     FINISH_POSITION = (156, 250)
-    TRACK_BORDER = scaleImage(pygame.image.load("imgs/track-border.png"), 1, 1)
 
     RED_CAR = scaleImage(pygame.image.load("imgs/red-car.png"), 0.3, 0.3)
     GREEN_CAR = scaleImage(pygame.image.load("imgs/green-car.png"), 0.3, 0.3)
@@ -35,17 +72,17 @@ def guiP():
         player_car.draw(win)
 
     # each player in game will have this class
-    class PlayerCar(abstractcar.AbstractCar):
-        IMG = RED_CAR
-        START_POS = (180, 200)
+    class PlayerCar(AbstractCar):
+        # IMG = GREY_CAR
+        # START_POS = (180, 200)
 
-        def __init__(self, max_vel, rotation_vel, CarID,
-                     StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
-            super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
+        def __init__(self, max_vel, rotation_vel, CarID,StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
             self.CarID = CarID
             self.StartPos = StartPos
             self.IMG = CAR_IMGS[CarID]
             self.START_POS = StartPos  # use self.x better
+            super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
+
 
     player1 = PlayerCar(4, 4, 0, (180, 250))  # RED
     player2 = PlayerCar(4, 4, 1, (170, 250))  # GREEN
@@ -53,7 +90,8 @@ def guiP():
 
     context = zmq.Context()
     puller = context.socket(zmq.PULL)
-    puller.connect("tcp://localhost:80819")
+    GUIport = dictionary["GUIPort"]
+    puller.connect("tcp://localhost:"+str(GUIport))
     run = True
     while run:
         for event in pygame.event.get():
@@ -73,10 +111,15 @@ def guiP():
             arr_players_class[player_id].y = p_status["posy"]
             arr_players_class[player_id].angle = p_status["angle"]
             DrawCar(WIN, arr_players_class[player_id])
-            print(f"display updated")
-
     pygame.quit()
-    eventScript.myevent.set()
-    print("PGAME ENDED")
+
+    context = zmq.Context()
+    psr = context.socket(zmq.PUSH)
+    KillPort = dictionary["KillPort"]
+    psr.bind("tcp://*:"+str(KillPort))
+    for i in range(5):
+        print("PGAME ENDED")
+        print("!!! __KILL__ !!!")
+    psr.send_string("KILL ALL")
 
 

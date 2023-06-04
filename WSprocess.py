@@ -3,10 +3,11 @@ import websocket
 import json
 import threading
 import zmq
+from ReadFromDict import *
 WS = None
 carID = -1 #TODO : WHAT ?
 pusher = None
-
+dicitonary = read_dictionary_from_file()
 
 def on_open(ws):
     print("Connection opened")
@@ -60,7 +61,8 @@ def sendMovementThread():
     global WS
     context = zmq.Context()
     puller = context.socket(zmq.PULL)
-    puller.connect("tcp://localhost:80801")
+    KeyboardPort = dicitonary["keyboardPort"]
+    puller.connect("tcp://localhost:"+str(KeyboardPort))
     while True:
         movement = puller.recv_string()
         WS.send(movement)
@@ -70,8 +72,8 @@ def wsP():
     global pusher
     context = zmq.Context()
     pusher = context.socket(zmq.PUSH)
-    pusher.bind("tcp://*:80819")
-
+    GUIPort = dicitonary["GUIPort"]
+    pusher.bind("tcp://*:"+str(GUIPort))
     time.sleep(1)
     server = 'ws://35.158.245.102:17611'
     ws = websocket.WebSocketApp(server,

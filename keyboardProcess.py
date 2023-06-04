@@ -2,12 +2,15 @@ import time
 import keyboard
 import json
 import zmq
+from ReadFromDict import *
 
 def kbP():
     print("keyboard Process started..")
     context = zmq.Context()
     pusher = context.socket(zmq.PUSH)
-    pusher.bind("tcp://*:80801")
+    PortsDictionary = read_dictionary_from_file()
+    keyboardPort = PortsDictionary["keyboardPort"]
+    pusher.bind("tcp://*:"+str(keyboardPort))
     time.sleep(1)
     while 1:
         global kbbtns
@@ -35,4 +38,4 @@ def kbP():
         movement = json.dumps({"movement":kbbtns})
         print("MOVEMENT : ", movement)
         pusher.send_string(movement)
-        time.sleep(0.1)
+        time.sleep(0.05)
