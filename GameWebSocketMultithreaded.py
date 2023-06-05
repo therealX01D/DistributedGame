@@ -27,7 +27,7 @@ def get_user_name():
 
     manager = pygame_gui.UIManager((WIDTH, HEIGHT))
 
-    text_input = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((100, 0), (300, 50)), manager=manager,
+    text_input = pygame_gui.elements.UITextEntryLine(relative_rect=pygame.Rect((0, 0), (300, 50)), manager=manager,
                                                      object_id='#main_text_entry')
 
     clock = pygame.time.Clock()
