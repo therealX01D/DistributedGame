@@ -259,9 +259,10 @@ async def broadcast(message):
 
 startServer = websockets.serve(handler, IPADDRESS, PORT)
 
-async def main(maxP):
+async def main():
     global max_players
-    max_players = maxP
+
+    max_players =int(input("Enter max player"))
     async with websockets.serve(handler, IPADDRESS, PORT):
         await asyncio.Future()  # run forever
 
