@@ -104,7 +104,7 @@ class PlayerCar(AbstractCar):
         self.move()
 
 player1 = PlayerCar(4,4,0,(170,210))
-player2 = PlayerCar(4,4,1,(190,210))
+player2 = PlayerCar(4,4,1,(200,210))
 arr_players_class = [player1,player2]
 ##END: PYGAME ASSETS
 
