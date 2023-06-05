@@ -8,13 +8,13 @@ from keyboardProcess import kbP
 import zmq
 from ReadFromDict import *
 import portsChecker
-import pickle
 import pygame
 import pygame_gui
 username = "oaayoub"
 def take_username(txt):
-    with open("username.pkl", "wb") as f:
-        pickle.dump(txt, f)
+    txt = str(txt)
+    with open("username", "wb") as f:
+        f.write(txt.encode())
 
 
 def get_user_name():
@@ -42,6 +42,7 @@ def get_user_name():
                 txt = event.text
                 global username
                 username = txt
+                print(username)
                 take_username(txt)
                 done = True
                 break

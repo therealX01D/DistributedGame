@@ -13,8 +13,11 @@ READY = False
 def on_open(ws):
     print("Connection opened")
     username = "oaayoub"
-    UN = json.dumps({"username":username})
-    ws.send(UN)
+    f = open("username", "r")
+    UN = str(f.read())
+    f.close()
+    print(UN)
+    ws.send(json.dumps({"username" : UN}))
 
 def on_message(ws, message): #recieve
     # TODO : a try to fix window issue
