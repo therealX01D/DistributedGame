@@ -20,6 +20,7 @@ connected_clients_WSs = set()
 users = set()
 IP__username = {}
 username__id = {}
+id__username = {}
 GS = None
 ##PYGAME ASSETS
 RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
@@ -206,7 +207,8 @@ def processMovement(id,message):
             mover_player_car.bounce()
         else:
             mover_player_car.reset()
-            print("finish")
+            Tempdict = {"winner" : id__username[id]}
+            broadcast(json.dumps(Tempdict))
     print(f"new xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
 
     print("processed movement")
