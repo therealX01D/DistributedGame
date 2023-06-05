@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from Helpers import *
 import zmq
@@ -5,8 +7,13 @@ import json
 from ReadFromDict import *
 import Button as button
 dictionary = read_dictionary_from_file()
-
-MAIN_FONT = pygame.font.SysFont("comicsans", 44)
+def kill():
+    pygame.quit()
+    context = zmq.Context()
+    psr = context.socket(zmq.PUSH)
+    KillPort = dictionary["KillPort"]
+    psr.bind("tcp://*:"+str(KillPort))
+    psr.send_string("KILL ALL")
 
 def guiP():
     import math
@@ -51,6 +58,7 @@ def guiP():
                 self.vel = min(self.vel + self.acceleration / 4, 0)
             self.move()
     ##GAME ASSETS
+
     GRASS = scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
     TRACK = pygame.image.load("imgs/track.png")
     FINISH = scaleImage(pygame.image.load("imgs/finish.png"), 0.8, 0.8)
@@ -93,6 +101,9 @@ def guiP():
     puller.connect("tcp://localhost:"+str(GUIport))
     run = True
     pygame.init()
+    pygame.font.init()
+    MAIN_FONT = pygame.font.SysFont("comicsans", 44)
+
     mic_img = pygame.image.load('imgs/mic.png').convert_alpha()
     mmic_img = pygame.image.load('imgs/MutedMic.png').convert_alpha()
     H = mic_img.get_height()*0.06
@@ -114,8 +125,12 @@ def guiP():
         gameStatus = json.loads(gameString)
         if isinstance(gameStatus,str) :
             #This is not a gameStatus this is the winner username
-            print(f"Winner is {gameStatus}")
+            for i in range(1000):
+                print(f"Winner is {gameStatus}")
             Helpers.blit_text_center(WIN,MAIN_FONT,text=f"WINNER IS {gameStatus}")
+            time.sleep(6)
+            kill()
+
 
         # print(f"[GUI]{gameStatus}")
         DrawImages(WIN, myimages)
@@ -126,15 +141,11 @@ def guiP():
             arr_players_class[player_id].y = p_status["posy"]
             arr_players_class[player_id].angle = p_status["angle"]
             DrawCar(WIN, arr_players_class[player_id])
-    pygame.quit()
 
-    context = zmq.Context()
-    psr = context.socket(zmq.PUSH)
-    KillPort = dictionary["KillPort"]
-    psr.bind("tcp://*:"+str(KillPort))
+
     for i in range(5):
         print("PGAME ENDED")
         print("!!! __KILL__ !!!")
-    psr.send_string("KILL ALL")
+    kill()
 
 

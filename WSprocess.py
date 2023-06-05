@@ -50,7 +50,6 @@ def on_message(ws, message): #recieve
             global pusher
             pusher.send_string(json.dumps(gameStatus))
         elif "winner" in loaded_jsn_msg.keys():
-            global pusher
             winner =  loaded_jsn_msg["winner"]
             pusher.send_string(json.dumps(winner))
 

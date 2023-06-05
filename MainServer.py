@@ -171,8 +171,6 @@ async def handler(ws, path):
                 processMovement(carid,movs)
                 prepareGameStatus()
                 await ws.send(json.dumps(GS))
-
-
             elif "username" in loaded_jsn_mssg.keys():
                     await ws.send("READY")
 
