@@ -10,11 +10,11 @@ def write_dictionary_to_file(dictionary, filename):
 
 
 def PortsInit() :
-    keyboardPort = 60001
-    GUIPort = 60002
-    KillPort = 60003
-    VoicePort = 60004
-    KBaccPort = 60005
+    keyboardPort = 8016
+    GUIPort = 8017
+    KillPort = 8018
+    VoicePort = 8019
+    KBaccPort = 8020
     while is_port_reserved(keyboardPort):
         keyboardPort+=1
     while is_port_reserved(GUIPort):

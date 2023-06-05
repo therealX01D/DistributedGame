@@ -9,7 +9,9 @@ if __name__ == "__main__" :
     puller = context.socket(zmq.PULL)
     puller.connect("tcp://localhost:"+str(20211))
     while True:
+        print("Starting Process")
         ServerProcess.start()
         puller.recv_string()
+        print("terminating ....")
         ServerProcess.terminate()
         time.sleep(9)
