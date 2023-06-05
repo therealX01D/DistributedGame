@@ -47,7 +47,7 @@ FINISH_POSITION = (140, 250)
 
 context = zmq.Context()
 killer = context.socket(zmq.PUSH)
-killer.bind("tcp://localhost:"+str(20211))
+killer.bind("tcp://*:"+str(20211))
 ##
 class AbstractCar:
     def __init__(self, max_vel, rotation_vel):
