@@ -6,6 +6,7 @@ from ReadFromDict import *
 import Button as button
 dictionary = read_dictionary_from_file()
 
+MAIN_FONT = pygame.font.SysFont("comicsans", 44)
 
 def guiP():
     import math
@@ -111,6 +112,11 @@ def guiP():
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
         gameStatus = json.loads(gameString)
+        if isinstance(gameStatus,str) :
+            #This is not a gameStatus this is the winner username
+            print(f"Winner is {gameStatus}")
+            Helpers.blit_text_center(WIN,MAIN_FONT,text=f"WINNER IS {gameStatus}")
+
         # print(f"[GUI]{gameStatus}")
         DrawImages(WIN, myimages)
         for key in gameStatus:

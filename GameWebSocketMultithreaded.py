@@ -57,6 +57,7 @@ def get_user_name():
 
         pygame.display.update()
         if done:
+            pygame.display.quit()
             break
 
 

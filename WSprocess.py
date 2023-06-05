@@ -23,13 +23,13 @@ def on_message(ws, message): #recieve
     try:
         loaded_jsn_msg = json.loads(message)
     except:
-        print("NOT JSON MESSAGE : ", message)
+        # print("NOT JSON MESSAGE : ", message)
         loaded_jsn_msg = message
 
     print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
     if isinstance(loaded_jsn_msg, str):
         if message == "READY":
-            print("I GOT 'READY' message..")
+            # print("I GOT 'READY' message..")
             global READY
             READY = True
             global dicitonary
@@ -38,7 +38,6 @@ def on_message(ws, message): #recieve
             KBaccPort = dicitonary["KBaccPort"]
             pshr.bind("tcp://*:" + str(KBaccPort))
             pshr.send_string("READY")
-
     if isinstance(loaded_jsn_msg, dict):
         print("ITS DICT")
         if "carID" in loaded_jsn_msg.keys():
@@ -47,14 +46,15 @@ def on_message(ws, message): #recieve
 
         elif "game" in loaded_jsn_msg.keys():
             gameStatus = loaded_jsn_msg["game"]
-            print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
+            # print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
             global pusher
             pusher.send_string(json.dumps(gameStatus))
-    #TODO: If there are problems when connecting lots of players
-    # DUE TO LOTS OF MESSAGES FROM EVERYONE
-    # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
+        elif "winner" in loaded_jsn_msg.keys():
+            global pusher
+            winner =  loaded_jsn_msg["winner"]
+            pusher.send_string(json.dumps(winner))
 
-    print(f"(ON MESSAGE) ..E") #
+    # print(f"(ON MESSAGE) ..E") #
 
 def on_error(ws, error):
     print("*Error*", error)
