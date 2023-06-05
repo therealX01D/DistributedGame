@@ -6,11 +6,19 @@ from keyboardProcess import kbP
 import zmq
 from ReadFromDict import *
 import portsChecker
+import pickle
+
+def take_username():
+    un = input("Enter username : \n")
+    with open("username.pkl", "wb") as f:
+        pickle.dump(un, f)
+
 if __name__ == "__main__" :
     portsChecker.PortsInit()
     wsP = mp.Process(target=wsP)
     pgP = mp.Process(target=guiP)
     kbP = mp.Process(target=kbP)
+    take_username()
     wsP.start()
     kbP.start()
     pgP.start()

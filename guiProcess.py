@@ -3,7 +3,7 @@ from Helpers import *
 import zmq
 import json
 from ReadFromDict import *
-
+import Button as button
 dictionary = read_dictionary_from_file()
 
 
@@ -75,7 +75,7 @@ def guiP():
     # each player in game will have this class
     class PlayerCar(AbstractCar):
         def __init__(self, max_vel, rotation_vel, CarID,
-                     StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
+                     StartPos):
             self.CarID = CarID
             self.IMG = CAR_IMGS[CarID]
             self.START_POS = StartPos  # use self.x better
@@ -91,16 +91,27 @@ def guiP():
     GUIport = dictionary["GUIPort"]
     puller.connect("tcp://localhost:"+str(GUIport))
     run = True
+    pygame.init()
+    mic_img = pygame.image.load('imgs/mic.png').convert_alpha()
+    mmic_img = pygame.image.load('imgs/MutedMic.png').convert_alpha()
+    H = mic_img.get_height()*0.06
+    mmic = button.Button(0, HEIGHT-H, mmic_img, 0.06)
+    mic = button.Button(0, HEIGHT-H, mic_img, 0.06)
+    MIC = mmic
+    micMuted  = 1
+    MICS = [mic,mmic]
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = 0
-
+        if MIC.draw(WIN):
+            micMuted ^= 1
+            MIC = MICS[micMuted] #TODO : problem here
+            print(f"MIC muted : {micMuted}")
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
         gameStatus = json.loads(gameString)
         print(f"[GUI]{gameStatus}")
-        #TODO : read game status from zmq
         DrawImages(WIN, myimages)
         for key in gameStatus:
             player_id = int(key)

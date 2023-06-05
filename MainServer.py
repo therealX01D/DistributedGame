@@ -92,7 +92,7 @@ class AbstractCar:
 #each player in game will have this class
 class PlayerCar(AbstractCar):
     def __init__(self, max_vel, rotation_vel, CarID,
-                 StartPos):  # TODO : THIS IS SSHIT AND MAY CAUSE ERROR , MAKE SURE IT WORKS RIGHT
+                 StartPos):
         self.CarID = CarID
         self.IMG = CAR_IMGS[CarID]
         self.START_POS = StartPos
@@ -139,7 +139,6 @@ async def handler(ws, path):
             username = loaded_jsn_mssg["username"]
             print(f"username is :{loaded_jsn_mssg['username']}")
             IP = ws.remote_address[0]
-            #TODO : IP + PORT => username
             IP__username[IP] = username
             username__id[username] = curr_players
             print(f"{username} : given ID :{curr_players} ")
@@ -150,6 +149,7 @@ async def handler(ws, path):
             if curr_players == max_players:
                 print(" Broadcasting 'READY'....")
                 await broadcast("READY")
+                #TODO : SEND OTHER PLAYERS IPs for voice chat
 
         elif curr_players>=max_players and not registered_before:
             print(f"GAME READY AND YOU ARE NOT INVITED :( ")

@@ -5,19 +5,19 @@ import threading
 import zmq
 from ReadFromDict import *
 WS = None
-carID = -1 #TODO : WHAT ?
 pusher = None
 dicitonary = read_dictionary_from_file()
 READY = False
-
+username = "oaayoub"
 def on_open(ws):
     print("Connection opened")
-    username = "oaayoub"
+    global  username
+    with open("username.pkl", "rb") as file:
+        username = pickle.load(file)
     UN = json.dumps({"username":username})
     ws.send(UN)
-
+    #TODO : Errors here for username check main GameWeb...
 def on_message(ws, message): #recieve
-    # TODO : a try to fix window issue
     print('(ON MESSAGE) ..S')
     print(f"[Received From Server] {message}")
     try:
@@ -44,9 +44,7 @@ def on_message(ws, message): #recieve
             print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
             global pusher
             pusher.send_string(json.dumps(gameStatus))
-    #TODO: If there are problems when connecting lots of players
-    # DUE TO LOTS OF MESSAGES FROM EVERYONE
-    # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
+
 
     print(f"(ON MESSAGE) ..E") #
 
