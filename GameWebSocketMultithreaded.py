@@ -12,10 +12,9 @@ import pickle
 import pygame
 import pygame_gui
 username = "oaayoub"
-def take_username():
-    un = input("Enter username : \n")
+def take_username(txt):
     with open("username.pkl", "wb") as f:
-        pickle.dump(un, f)
+        pickle.dump(txt, f)
 
 
 def get_user_name():
@@ -43,7 +42,7 @@ def get_user_name():
                 txt = event.text
                 global username
                 username = txt
-                print(txt)
+                take_username(txt)
                 done = True
                 break
 
