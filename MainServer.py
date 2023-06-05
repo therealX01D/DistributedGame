@@ -22,6 +22,7 @@ IP__username = {}
 username__id = {}
 id__username = {}
 GS = None
+GameWinner = None
 ##PYGAME ASSETS
 RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
 GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"),0.3,0.3)
@@ -170,7 +171,10 @@ async def handler(ws, path):
                 print("IT's a movement")
                 processMovement(carid,movs)
                 prepareGameStatus()
-                await ws.send(json.dumps(GS))
+                if GameWinner == None:
+                    await ws.send(json.dumps(GS))
+                else :
+                    await ws.send(json.dumps({"winner" : GameWinner}))
 
 
             elif "username" in loaded_jsn_mssg.keys():
@@ -208,8 +212,8 @@ def processMovement(id,message):
             mover_player_car.bounce()
         else:
             mover_player_car.reset()
-            Tempdict = {"winner" : id__username[id]}
-            broadcast(json.dumps(Tempdict))
+            global GameWinner
+            GameWinner = id__username[id]
     print(f"new xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
 
     print("processed movement")

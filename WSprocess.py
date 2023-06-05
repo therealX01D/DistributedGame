@@ -26,7 +26,7 @@ def on_message(ws, message): #recieve
         # print("NOT JSON MESSAGE : ", message)
         loaded_jsn_msg = message
 
-    print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
+    # print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
     if isinstance(loaded_jsn_msg, str):
         if message == "READY":
             # print("I GOT 'READY' message..")

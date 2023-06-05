@@ -123,6 +123,7 @@ def guiP():
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
         gameStatus = json.loads(gameString)
+        print(f"[WS -> GUI] : {gameStatus}")
         if isinstance(gameStatus,str) :
             #This is not a gameStatus this is the winner username
             for i in range(1000):
