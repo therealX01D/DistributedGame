@@ -5,19 +5,19 @@ import threading
 import zmq
 from ReadFromDict import *
 WS = None
+carID = -1 #TODO : WHAT ?
 pusher = None
 dicitonary = read_dictionary_from_file()
 READY = False
-username = "oaayoub"
+
 def on_open(ws):
     print("Connection opened")
-    global  username
-    with open("username.pkl", "rb") as file:
-        username = pickle.load(file)
+    username = "oaayoub"
     UN = json.dumps({"username":username})
     ws.send(UN)
-    #TODO : Errors here for username check main GameWeb...
+
 def on_message(ws, message): #recieve
+    # TODO : a try to fix window issue
     print('(ON MESSAGE) ..S')
     print(f"[Received From Server] {message}")
     try:
@@ -32,6 +32,12 @@ def on_message(ws, message): #recieve
             print("I GOT 'READY' message..")
             global READY
             READY = True
+            global dicitonary
+            context = zmq.Context()
+            pshr = context.socket(zmq.PUSH)
+            KBaccPort = dicitonary["KBaccPort"]
+            pshr.bind("tcp://*:" + str(KBaccPort))
+            pshr.send_string("READY")
 
     if isinstance(loaded_jsn_msg, dict):
         print("ITS DICT")
@@ -44,7 +50,9 @@ def on_message(ws, message): #recieve
             print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
             global pusher
             pusher.send_string(json.dumps(gameStatus))
-
+    #TODO: If there are problems when connecting lots of players
+    # DUE TO LOTS OF MESSAGES FROM EVERYONE
+    # .SLEEP THIS THREAD FOR A WHILE  (uncomment next line)
 
     print(f"(ON MESSAGE) ..E") #
 
@@ -76,7 +84,7 @@ def wsP():
     pusher = context.socket(zmq.PUSH)
     GUIPort = dicitonary["GUIPort"]
     pusher.bind("tcp://*:"+str(GUIPort))
-    time.sleep(1)
+    time.sleep(0.1)
     server = 'ws://35.158.245.102:17611'
     ws = websocket.WebSocketApp(server,
                                 on_open=on_open,
@@ -88,7 +96,7 @@ def wsP():
     WS = ws
     wst.start()
     smt = threading.Thread(target=sendMovementThread)
-    time.sleep(1)
+    time.sleep(0.1)
     smt.start()
     # while 1:
     #     ws.run_forever()

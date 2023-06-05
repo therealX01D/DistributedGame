@@ -9,8 +9,12 @@ print(external_ip)
 reviever = AudioReceiver(external_ip,9090)
 reviever_thread = threading.Thread(target=reviever.start_server())
 clients = ['0.0.0.0']
-for client in clients:
-    sender = AudioSender(client,5555)
-    sender_thread = threading.Thread(target=sender.start_stream)
-    sender_thread.start()
-reviever_thread.start()
+Voiceport = None
+# async def vP():
+#         for un in clients:
+
+            # sender = AudioSender(client,5555)
+            # sender_thread = threading.Thread(target=sender.start_stream)
+            # sender_thread.start()
+    # reviever_thread.start()
+

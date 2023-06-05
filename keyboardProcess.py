@@ -5,13 +5,18 @@ import zmq
 from ReadFromDict import *
 
 def kbP():
-    print("keyboard Process started..")
+    # print("keyboard Process started..")
     context = zmq.Context()
     pusher = context.socket(zmq.PUSH)
+    puller = context.socket(zmq.PULL)
     PortsDictionary = read_dictionary_from_file()
     keyboardPort = PortsDictionary["keyboardPort"]
+    KBaccPort = PortsDictionary["KBaccPort"]
     pusher.bind("tcp://*:"+str(keyboardPort))
-    time.sleep(1)
+    puller.connect("tcp://localhost:"+str(KBaccPort))
+    print("KB WAITING")
+    puller.recv_string()
+    print("KB LOOP READY")
     while 1:
         global kbbtns
         kbbtns = ""

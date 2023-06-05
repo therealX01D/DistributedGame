@@ -18,7 +18,7 @@ def guiP():
             self.rotation_vel = rotation_vel
             self.angle = 0
             self.x, self.y = self.START_POS
-            print("START POS OF CAR",self.START_POS)
+            # print("START POS OF CAR",self.START_POS)
             self.acceleration = 0.05
 
         def rotate(self, left=False, right=False):
@@ -106,12 +106,12 @@ def guiP():
                 run = 0
         if MIC.draw(WIN):
             micMuted ^= 1
-            MIC = MICS[micMuted] #TODO : problem here
-            print(f"MIC muted : {micMuted}")
+            MIC = MICS[micMuted]
+
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
         gameStatus = json.loads(gameString)
-        print(f"[GUI]{gameStatus}")
+        # print(f"[GUI]{gameStatus}")
         DrawImages(WIN, myimages)
         for key in gameStatus:
             player_id = int(key)
