@@ -100,25 +100,38 @@ def guiP():
     GUIport = dictionary["GUIPort"]
     puller.connect("tcp://localhost:"+str(GUIport))
     run = True
-    pygame.init()
+    #pygame.init()
     pygame.font.init()
     MAIN_FONT = pygame.font.SysFont("comicsans", 44)
 
     mic_img = pygame.image.load('imgs/mic.png').convert_alpha()
     mmic_img = pygame.image.load('imgs/MutedMic.png').convert_alpha()
+    hsON_img = pygame.image.load('imgs/headsetOn.png').convert_alpha()
+    hsOFF_img = pygame.image.load('imgs/headsetOff.png').convert_alpha()
+
     H = mic_img.get_height()*0.06
     mmic = button.Button(0, HEIGHT-H, mmic_img, 0.06)
     mic = button.Button(0, HEIGHT-H, mic_img, 0.06)
-    MIC = mmic
-    micMuted  = 1
-    MICS = [mic,mmic]
+    Factor = 0.17
+    H = hsON_img.get_height()*Factor
+    hsON = button.Button(30, HEIGHT-H+7, hsON_img, Factor)
+    hsOFF = button.Button(30, HEIGHT-H+7, hsOFF_img, Factor)
+    MIC = mic
+    HEADSET = hsON
+    micOn  = 1
+    headsetOn  = 1
+    MICS = [mmic,mic]
+    HEADSETS = [hsOFF,hsON]
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = 0
         if MIC.draw(WIN):
-            micMuted ^= 1
-            MIC = MICS[micMuted]
+            micOn ^= 1
+            MIC = MICS[micOn]
+        if HEADSET.draw(WIN):
+            headsetOn ^= 1
+            HEADSET = HEADSETS[headsetOn]
 
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
@@ -127,12 +140,19 @@ def guiP():
         if "winner" in gameStatus.keys() :
             #This is not a gameStatus this is the winner username
             winner = gameStatus["winner"]
-            for i in range(1000):
-                print(f"Winner is {winner}")
-            Helpers.blit_text_center(WIN,MAIN_FONT,text=f"WINNER IS {winner}")
-            time.sleep(6)
-            kill()
-
+            while True:
+                Helpers.blit_text_center(WIN, MAIN_FONT, f"{winner} Wins .. GGs <3")
+                pygame.display.update()
+                B=1
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        B = 0
+                        kill()
+                        break
+                if B==0:
+                    run = 0
+                    kill()
+                    break
 
         # print(f"[GUI]{gameStatus}")
         DrawImages(WIN, myimages)
