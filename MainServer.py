@@ -177,8 +177,7 @@ async def handler(ws, path):
 
 async def processMovement(id,message):
     print("processing movement.. ")
-    #change game status
-    # global arr_players_class
+    
     print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
     mover_player_car = arr_players_class[id]
     movements = message.split(",")
