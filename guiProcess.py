@@ -103,7 +103,7 @@ def guiP():
     #pygame.init()
     pygame.font.init()
     MAIN_FONT = pygame.font.SysFont("comicsans", 44)
-
+    #TODO : Make font MS SANS SERIF
     mic_img = pygame.image.load('imgs/mic.png').convert_alpha()
     mmic_img = pygame.image.load('imgs/MutedMic.png').convert_alpha()
     hsON_img = pygame.image.load('imgs/headsetOn.png').convert_alpha()

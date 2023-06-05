@@ -9,7 +9,7 @@ carID = -1 #TODO : WHAT ?
 pusher = None
 dicitonary = read_dictionary_from_file()
 READY = False
-
+ServerPort = 17611
 def on_open(ws):
     print("Connection opened")
     username = "oaayoub"
@@ -86,7 +86,7 @@ def wsP():
     GUIPort = dicitonary["GUIPort"]
     pusher.bind("tcp://*:"+str(GUIPort))
     time.sleep(0.1)
-    server = 'ws://35.158.245.102:17611'
+    server = 'ws://35.158.245.102:'+str(ServerPort)
     ws = websocket.WebSocketApp(server,
                                 on_open=on_open,
                                 on_message=on_message,
