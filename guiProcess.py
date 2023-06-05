@@ -126,9 +126,10 @@ def guiP():
         print(f"[WS -> GUI] : {gameStatus}")
         if "winner" in gameStatus.keys() :
             #This is not a gameStatus this is the winner username
+            winner = gameStatus["winner"]
             for i in range(1000):
-                print(f"Winner is {gameStatus}")
-            Helpers.blit_text_center(WIN,MAIN_FONT,text=f"WINNER IS {gameStatus}")
+                print(f"Winner is {winner}")
+            Helpers.blit_text_center(WIN,MAIN_FONT,text=f"WINNER IS {winner}")
             time.sleep(6)
             kill()
 
