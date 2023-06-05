@@ -124,7 +124,7 @@ def guiP():
         gameString = puller.recv_string()
         gameStatus = json.loads(gameString)
         print(f"[WS -> GUI] : {gameStatus}")
-        if isinstance(gameStatus,str) :
+        if "winner" in gameStatus.keys() :
             #This is not a gameStatus this is the winner username
             for i in range(1000):
                 print(f"Winner is {gameStatus}")
