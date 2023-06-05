@@ -142,6 +142,7 @@ async def handler(ws, path):
             IP = ws.remote_address[0]
             IP__username[IP] = username
             username__id[username] = curr_players
+            id__username[curr_players] = username
             print(f"{username} : given ID :{curr_players} ")
             playerCarId = json.dumps({"carID": curr_players})
             curr_players=curr_players+1
