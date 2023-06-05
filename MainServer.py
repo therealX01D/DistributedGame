@@ -19,9 +19,7 @@ connected_clients_UNs = set()
 connected_clients_WSs = set()
 users = set()
 IP__username = {}
-username__IP = {}
 username__id = {}
-id__username = {}
 GS = None
 ##PYGAME ASSETS
 RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
@@ -171,13 +169,16 @@ async def handler(ws, path):
                 processMovement(carid,movs)
                 prepareGameStatus()
                 await ws.send(json.dumps(GS))
+
+
             elif "username" in loaded_jsn_mssg.keys():
                     await ws.send("READY")
 
 
-async def processMovement(id,message):
+def processMovement(id,message):
     print("processing movement.. ")
-    
+    #change game status
+    # global arr_players_class
     print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
     mover_player_car = arr_players_class[id]
     movements = message.split(",")
@@ -205,14 +206,11 @@ async def processMovement(id,message):
             mover_player_car.bounce()
         else:
             mover_player_car.reset()
-            tempDict = {"winner" : id__username[id]}
-            temp = json.dumps(tempDict)
-            await broadcast(temp)
-            #TODO : KILL PROCESS HERE
+            print("finish")
     print(f"new xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
 
-    # print("processed movement")
-    # print("GOING TO prepare game status")
+    print("processed movement")
+    print("GOING TO prepare game status")
 
 def prepareGameStatus():
     # Iterate over all connected clients and send the message
