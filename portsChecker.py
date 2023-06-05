@@ -1,8 +1,12 @@
 import socket
 import pickle
-def is_port_reserved(port):
+def find_port(port=8000):
+    """Find a port not in ues starting at given port"""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(('localhost', port)) == 0
+        if s.connect_ex(("localhost", port)) == 0:
+            return find_port(port=port + 1)
+        else:
+            return port
 
 def write_dictionary_to_file(dictionary, filename):
     with open(filename, "wb") as f:
@@ -10,21 +14,11 @@ def write_dictionary_to_file(dictionary, filename):
 
 
 def PortsInit() :
-    keyboardPort = 8016
-    GUIPort = 8017
-    KillPort = 8018
-    VoicePort = 8019
-    KBaccPort = 8020
-    while is_port_reserved(keyboardPort):
-        keyboardPort+=1
-    while is_port_reserved(GUIPort):
-        GUIPort+=1
-    while is_port_reserved(KillPort):
-        KillPort+=1
-    while is_port_reserved(VoicePort):
-        VoicePort+=1
-    while is_port_reserved(KBaccPort):
-        KBaccPort+=1
+    keyboardPort = find_port()
+    GUIPort = find_port(keyboardPort+1)
+    KillPort = find_port(GUIPort+1)
+    VoicePort = find_port(KillPort+1)
+    KBaccPort = find_port(VoicePort+1)
     dictionary = {"keyboardPort": keyboardPort, "GUIPort": GUIPort, "KillPort": KillPort , "VoicePort":VoicePort,"KBaccPort":KBaccPort}
     filename = "ports.pkl"
     write_dictionary_to_file(dictionary, filename)
