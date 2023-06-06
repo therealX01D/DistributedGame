@@ -9,15 +9,14 @@ import zmq
 from ReadFromDict import *
 import portsChecker
 from Screen1 import get_user_name
-username = "oaayoub"
 
 
 if __name__ == "__main__" :
     portsChecker.PortsInit()
+    get_user_name()
     wsP = mp.Process(target=wsP)
     pgP = mp.Process(target=guiP)
     kbP = mp.Process(target=kbP)
-    get_user_name()
     wsP.start()
     kbP.start()
     pgP.start()

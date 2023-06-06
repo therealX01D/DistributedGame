@@ -12,7 +12,7 @@ READY = False
 ServerPort = 17611
 def on_open(ws):
     print("Connection opened")
-    username = "oaayoub"
+    UN = "oaayoub"
     f = open("username", "r")
     UN = str(f.read())
     f.close()
@@ -85,7 +85,12 @@ def wsP():
     pusher = context.socket(zmq.PUSH)
     GUIPort = dicitonary["GUIPort"]
     pusher.bind("tcp://*:"+str(GUIPort))
-    time.sleep(0.1)
+    time.sleep(0.05)
+    global ServerPort
+    f = open("server_port", "r")
+    ServerPort = str(f.read())
+    f.close()
+    ServerPort.strip()
     server = 'ws://35.158.245.102:'+str(ServerPort)
     ws = websocket.WebSocketApp(server,
                                 on_open=on_open,
