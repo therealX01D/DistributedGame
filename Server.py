@@ -188,7 +188,9 @@ def RUN(Maxp):
 
                         await ws.send(json.dumps({"winner" : GameWinner}))
                         print("☠☠️☠️☠️Going to kill This Process☠️☠☠️☠")
-                        killer.send_string("END")
+                        res = await killer.send_string("END")
+                        print(f"{res}☠☠️☠️☠☠️☠")
+
 
 
                 elif "username" in loaded_jsn_mssg.keys():
