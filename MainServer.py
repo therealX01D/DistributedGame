@@ -9,8 +9,8 @@ vis = False
 if __name__ == "__main__":
     print("MAIN SERVER ")
     maxP = int(input("Enter Number of Max players"))
-    ServerProcess = mp.Process(target=Server.RUN,args=(maxP,))
     while True:
+        ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
         print("Starting Process")
         ServerProcess.start()
         if(vis == False):
@@ -18,5 +18,9 @@ if __name__ == "__main__":
             puller.connect("tcp://localhost:" + str(20222))
         puller.recv_string()
         print("I'm Dying xxxx....")
-        ServerProcess.terminate()
+
         print("Sleeping 9 seconds")
+        time.sleep(4)
+        ServerProcess.join()
+
+        ServerProcess.terminate()
