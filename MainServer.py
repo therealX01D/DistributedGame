@@ -21,6 +21,5 @@ if __name__ == "__main__":
 
         print("Sleeping 4 seconds")
         time.sleep(4)
-        ServerProcess.join()
-
         ServerProcess.terminate()
+        ServerProcess.join()
