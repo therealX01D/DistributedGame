@@ -123,7 +123,7 @@ def RUN(Maxp):
         print("inside Handeler")
         #websocket is the client websocket
         async for message in ws:
-            global curr_players
+            # global curr_players
             #if recieved message is a new connection
             registered_before = (ws.remote_address[0] in connected_clients_IPs)
             connected_clients_WSs.add(ws)
