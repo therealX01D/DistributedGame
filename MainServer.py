@@ -11,6 +11,7 @@ if __name__ == "__main__":
     maxP = int(input("Enter Number of Max players"))
     while True:
         ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
+        time.sleep(6)
         print("Starting Process")
         ServerProcess.start()
         if(vis == False):
