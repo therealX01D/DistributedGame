@@ -1,51 +1,52 @@
+# await pauses exec of co-routine
+import websockets
+import asyncio
+import pygame
+import Helpers
+import math
+import json
+import zmq
+import socket
+
+max_players = 2
+print(f"Max players given from main process :{max_players}")
+curr_players = 0
+IPADDRESS = "0.0.0.0"
+print("IP ADDRESS", IPADDRESS)
+
+PORT = 17611
+connected_clients_IPs = set()
+connected_clients_UNs = set()
+connected_clients_WSs = set()
+users = set()
+IP__username = {}
+username__id = {}
+id__username = {}
+GS = None
+GameWinner = None
+##PYGAME ASSETS
+RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"), 0.3, 0.3)
+GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"), 0.3, 0.3)
+GREY_CAR = Helpers.scaleImage(pygame.image.load("imgs/grey-car.png"), 0.3, 0.3)
+PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"), 0.3, 0.3)
+CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR]
+
+GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
+TRACK = pygame.image.load("imgs/track.png")
+FINISH = Helpers.scaleImage(pygame.image.load("imgs/finish.png"), 0.9, 0.9)
+TRACK_BORDER = Helpers.scaleImage(pygame.image.load("imgs/track-border.png"), 1, 1)
+TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER)
+
+FINISH = pygame.image.load("imgs/finish.png")
+FINISH_MASK = pygame.mask.from_surface(FINISH)
+FINISH_POSITION = (140, 250)
+
+
+##Killer
+
 def RUN(Maxp):
-    #await pauses exec of co-routine
-    import websockets
-    import asyncio
-    import pygame
-    import Helpers
-    import math
-    import json
-    import zmq
-    import socket
-    max_players = Maxp
-    print(f"Max players given from main process :{max_players}")
-    curr_players  =0
-    IPADDRESS = "0.0.0.0"
-    print("IP ADDRESS" , IPADDRESS)
-
-
-    PORT = 17611
-    connected_clients_IPs = set()
-    connected_clients_UNs = set()
-    connected_clients_WSs = set()
-    users = set()
-    IP__username = {}
-    username__id = {}
-    id__username = {}
-    GS = None
-    GameWinner = None
-    ##PYGAME ASSETS
-    RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"),0.3,0.3)
-    GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"),0.3,0.3)
-    GREY_CAR = Helpers.scaleImage(pygame.image.load("imgs/grey-car.png"),0.3,0.3)
-    PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"),0.3,0.3)
-    CAR_IMGS = [RED_CAR,GREEN_CAR,GREY_CAR,PURPLE_CAR]
-
-    GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
-    TRACK = pygame.image.load("imgs/track.png")
-    FINISH= Helpers.scaleImage(pygame.image.load("imgs/finish.png"),0.9,0.9)
-    TRACK_BORDER = Helpers.scaleImage(pygame.image.load("imgs/track-border.png"),1,1)
-    TRACK_BORDER_MASK = pygame.mask.from_surface(TRACK_BORDER)
-
-
-    FINISH = pygame.image.load("imgs/finish.png")
-    FINISH_MASK = pygame.mask.from_surface(FINISH)
-    FINISH_POSITION = (140, 250)
-
-
-    ##Killer
-
+    global max_players
+    max_players = int(Maxp)
     context = zmq.Context()
     killer = context.socket(zmq.PUSH)
     killer.bind("tcp://*:"+str(20222))
@@ -123,7 +124,7 @@ def RUN(Maxp):
         print("inside Handeler")
         #websocket is the client websocket
         async for message in ws:
-            # global curr_players
+            global curr_players
             #if recieved message is a new connection
             registered_before = (ws.remote_address[0] in connected_clients_IPs)
             connected_clients_WSs.add(ws)
