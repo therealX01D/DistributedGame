@@ -115,6 +115,7 @@ arr_players_class = [player1, player2]
 ##Killer
 
 def RUN(Maxp):
+    print("READY RUN")
     global max_players
     max_players = int(Maxp)
     context = zmq.Context()

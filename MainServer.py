@@ -13,6 +13,7 @@ if __name__ == "__main__":
         ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
         print("Starting Process")
         ServerProcess.start()
+        print("Staerted Process....")
         if(vis == False):
             vis = True
             puller.connect("tcp://localhost:" + str(20222))
