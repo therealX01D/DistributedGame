@@ -27,5 +27,5 @@ if __name__ == "__main__":
         if ServerProcess.is_alive():
             ServerProcess.kill()
             "PRINT KILLED"
-        else : 
+        else :
             print("PROCESS SURRENDERED")
