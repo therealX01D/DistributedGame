@@ -42,6 +42,74 @@ FINISH_MASK = pygame.mask.from_surface(FINISH)
 FINISH_POSITION = (140, 250)
 
 
+class AbstractCar:
+    def __init__(self, max_vel, rotation_vel):
+        self.img = self.IMG
+        self.max_vel = max_vel
+        self.vel = 0
+        self.rotation_vel = rotation_vel
+        self.angle = 0
+        self.x, self.y = self.START_POS
+        self.acceleration = 0.1
+
+    def rotate(self, left=False, right=False):
+        self.angle += left * 2 + right * -2
+
+    def draw(self, win):
+        Helpers.blit_rotate_center(win, self.img, (self.x, self.y), self.angle)
+
+    def move(self):
+        rad = math.radians(-self.angle)
+        vertical_v = -math.cos(rad) * self.vel
+        horizontal_v = math.sin(rad) * self.vel
+        self.x += horizontal_v
+        self.y += vertical_v
+
+    def move_forward(self):
+        self.vel = min(self.vel + self.acceleration, self.max_vel)  # threshold is max_vel
+        self.move()
+
+    def move_backward(self):
+        self.vel = max(self.vel - self.acceleration, -self.max_vel / 2)  # threshold is max_vel
+        self.move()
+
+    def reduce_speed(self):
+        if self.vel > 0:
+            self.vel = max(self.vel - self.acceleration / 2, 0)
+
+        if self.vel < 0:
+            self.vel = min(self.vel + self.acceleration / 2, 0)
+        self.move()
+
+    def collide(self, mask, x=0, y=0):
+        car_mask = pygame.mask.from_surface(self.img)
+        offset = (int(self.x - x), int(self.y - y))
+        poi = mask.overlap(car_mask, offset)
+        return poi
+
+    def reset(self):
+        self.x, self.y = self.START_POS
+        self.angle = 0
+        self.vel = 0
+
+
+# each player in game will have this class
+class PlayerCar(AbstractCar):
+    def __init__(self, max_vel, rotation_vel, CarID,
+                 StartPos):
+        self.CarID = CarID
+        self.IMG = CAR_IMGS[CarID]
+        self.START_POS = StartPos
+        super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
+
+    def bounce(self):
+        self.vel = -self.vel / 1.6
+        self.move()
+
+
+player1 = PlayerCar(4, 4, 0, (170, 210))
+player2 = PlayerCar(4, 4, 1, (200, 210))
+arr_players_class = [player1, player2]
 ##Killer
 
 def RUN(Maxp):
@@ -51,71 +119,7 @@ def RUN(Maxp):
     killer = context.socket(zmq.PUSH)
     killer.bind("tcp://*:"+str(20222))
     ##
-    class AbstractCar:
-        def __init__(self, max_vel, rotation_vel):
-            self.img = self.IMG
-            self.max_vel = max_vel
-            self.vel = 0
-            self.rotation_vel = rotation_vel
-            self.angle = 0
-            self.x, self.y = self.START_POS
-            self.acceleration = 0.1
 
-        def rotate(self, left=False, right=False):
-            self.angle += left * 2 + right * -2
-
-        def draw(self, win):
-            Helpers.blit_rotate_center(win, self.img, (self.x, self.y), self.angle)
-
-        def move(self):
-            rad = math.radians(-self.angle)
-            vertical_v = -math.cos(rad)*self.vel
-            horizontal_v = math.sin(rad)*self.vel
-            self.x += horizontal_v
-            self.y += vertical_v
-
-        def move_forward(self):
-            self.vel = min(self.vel + self.acceleration, self.max_vel) #threshold is max_vel
-            self.move()
-
-        def move_backward(self):
-            self.vel = max(self.vel - self.acceleration, -self.max_vel/2) #threshold is max_vel
-            self.move()
-
-        def reduce_speed(self):
-            if self.vel>0:
-                self.vel = max(self.vel - self.acceleration / 2, 0)
-
-            if self.vel<0:
-                self.vel = min(self.vel + self.acceleration / 2, 0)
-            self.move()
-        def collide(self,mask,x=0,y=0):
-            car_mask =  pygame.mask.from_surface(self.img)
-            offset = (int(self.x - x),int(self.y - y))
-            poi = mask.overlap(car_mask,offset)
-            return poi
-
-        def reset(self):
-            self.x, self.y = self.START_POS
-            self.angle = 0
-            self.vel = 0
-
-
-    #each player in game will have this class
-    class PlayerCar(AbstractCar):
-        def __init__(self, max_vel, rotation_vel, CarID,
-                     StartPos):
-            self.CarID = CarID
-            self.IMG = CAR_IMGS[CarID]
-            self.START_POS = StartPos
-            super().__init__(max_vel, rotation_vel)  # Call the parent class constructor
-        def bounce(self):
-            self.vel = -self.vel/1.6
-            self.move()
-
-    player1 = PlayerCar(4,4,0,(170,210))
-    player2 = PlayerCar(4,4,1,(200,210))
-    arr_players_class = [player1,player2]
     ##END: PYGAME ASSETS
 
 
@@ -194,7 +198,7 @@ def RUN(Maxp):
     def processMovement(id,message):
         print("processing movement.. ")
         #change game status
-        # global arr_players_class
+        global arr_players_class
         print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
         mover_player_car = arr_players_class[id]
         movements = message.split(",")
@@ -230,8 +234,10 @@ def RUN(Maxp):
         print("GOING TO prepare game status")
 
     def prepareGameStatus():
-        # Iterate over all connected clients and send the message
-        global  arr_players_class
+        print("processing GS.. ")
+        # change game status
+        global arr_players_class
+
         playerStatus = {}
         for i in range(max_players):
             p = arr_players_class[i]
