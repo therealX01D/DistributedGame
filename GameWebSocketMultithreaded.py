@@ -1,6 +1,5 @@
 #CLIENT
 import multiprocessing as mp
-import time
 
 from WSprocess import wsP
 from guiProcess import guiP
