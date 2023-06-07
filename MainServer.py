@@ -1,19 +1,23 @@
 import multiprocessing as mp
 import time
 
-from Server import main
+import Server
 import zmq
 context = zmq.Context()
-
-print("MAIN SERVER ")
-ServerProcess = mp.Process(target=main)
 puller = context.socket(zmq.PULL)
-puller.connect("tcp://localhost:"+str(20211))
-while True:
-    print("Starting Process")
-    ServerProcess.start()
-    puller.recv_string()
-    print("terminating ....")
-    ServerProcess.terminate()
-    print("Sleeping 9 seconds")
-    time.sleep(9)
+vis = False
+if __name__ == "__main__":
+    print("MAIN SERVER ")
+    maxP = int(input("Enter Number of Max players"))
+    ServerProcess = mp.Process(target=Server.RUN,args=(maxP,))
+    while True:
+        print("Starting Process")
+        ServerProcess.start()
+        if(vis == False):
+            vis = True
+            puller.connect("tcp://localhost:" + str(20222))
+        puller.recv_string()
+        print("I'm Dying xxxx....")
+        ServerProcess.terminate()
+        print("Sleeping 9 seconds")
+        time.sleep(9)
