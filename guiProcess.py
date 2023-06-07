@@ -140,19 +140,20 @@ def guiP():
         if "winner" in gameStatus.keys() :
             #This is not a gameStatus this is the winner username
             winner = gameStatus["winner"]
-            while True:
+            t_start = time.time()
+
+            while time.time() - t_start < 4:
                 Helpers.blit_text_center(WIN, MAIN_FONT, f"{winner} Wins .. GGs <3")
                 pygame.display.update()
                 B=1
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         B = 0
-                        kill()
-                        break
                 if B==0:
                     run = 0
                     kill()
                     break
+            kill()
 
         # print(f"[GUI]{gameStatus}")
         DrawImages(WIN, myimages)

@@ -20,4 +20,3 @@ if __name__ == "__main__":
         print("I'm Dying xxxx....")
         ServerProcess.terminate()
         print("Sleeping 9 seconds")
-        time.sleep(9)
