@@ -23,4 +23,9 @@ if __name__ == "__main__":
         print("Sleeping 4 seconds")
         time.sleep(4)
         ServerProcess.terminate()
-        ServerProcess.join()
+        ServerProcess.join(timeout=3)
+        if ServerProcess.is_alive():
+            ServerProcess.kill()
+            "PRINT KILLED"
+        else : 
+            print("PROCESS SURRENDERED")
