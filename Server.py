@@ -188,8 +188,7 @@ def RUN(Maxp):
 
                         await ws.send(json.dumps({"winner" : GameWinner}))
                         print("☠☠️☠️☠️Going to kill This Process☠️☠☠️☠")
-                        res = await killer.send_string("END")
-                        print(f"{res}☠☠️☠️☠☠️☠")
+                        await killer.send_string("END")
 
 
 

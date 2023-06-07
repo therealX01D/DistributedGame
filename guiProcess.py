@@ -142,7 +142,7 @@ def guiP():
             winner = gameStatus["winner"]
             t_start = time.time()
 
-            while time.time() - t_start < 4:
+            while time.time() - t_start < 6:
                 Helpers.blit_text_center(WIN, MAIN_FONT, f"{winner} Wins .. GGs <3")
                 pygame.display.update()
                 B=1
