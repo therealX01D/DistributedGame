@@ -1,4 +1,6 @@
 # await pauses exec of co-routine
+import time
+
 import websockets
 import asyncio
 import pygame
@@ -188,7 +190,9 @@ def RUN(Maxp):
 
                         await ws.send(json.dumps({"winner" : GameWinner}))
                         print("☠☠️☠️☠️Going to kill This Process☠️☠☠️☠")
-                        killer.send_string("END")
+                        while 1:
+                            killer.send_string("END")
+                            time.sleep(10)
                         # await killer.send_string("END")
 
 
