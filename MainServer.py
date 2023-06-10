@@ -11,12 +11,11 @@ if __name__ == "__main__":
     print("MAIN SERVER ")
     maxP = int(input("Enter Number of Max players"))
     while True:
-        ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
-        time.sleep(5)
         VoiceProcess = mp.Process(target=VCserverProcess.vcsP())
+        ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
         print("Starting Process")
-        ServerProcess.start()
         VoiceProcess.start()
+        ServerProcess.start()
         print("Staerted Process....")
         if(vis == False):
             vis = True
