@@ -34,7 +34,7 @@ def vcP():
                 data = input_stream.read(Chunks)
                 client.send(data)
             except:
-                break
+                print("ERROR in sending")
 
     def receive():
         while (True):
@@ -42,7 +42,7 @@ def vcP():
                 data = client.recv(Chunks)
                 output_stream.write(data)
             except:
-                break
+                print("ERROR IN RECIEVING AUDIO")
 
     t1 = threading.Thread(target=send)
     t2 = threading.Thread(target=receive)

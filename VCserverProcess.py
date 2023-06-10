@@ -1,7 +1,7 @@
 import socket
 import threading
 
-client = []
+clients = []
 
 def vcsP():
     print("Hello voice Server")
@@ -16,18 +16,21 @@ def vcsP():
 
     while(True):
         conn, addr = server.accept()
-        client.append(conn)
+        print("RECIEVED CONNECTION FROM : ",addr)
+        clients.append(conn)
         t = threading.Thread(target = send, args = (conn, ))
         t.start()
 
 def send(fromConnection):
         while(True):
                 data = fromConnection.recv(4096)
-                for cl in client:
+                print("RECIEVED AUDIOP FROM ",fromConnection)
+                print("CLIENT LIST", clients)
+                for cl in clients:
                     try:
                         if cl != fromConnection:
                             cl.send(data)
                     except:
                         print("Client Disconnected",cl)
-                        client.remove(cl)
+                        clients.remove(cl)
 

@@ -11,10 +11,10 @@ import zmq
 import socket
 
 max_players = 2
-print(f"Max players given from main process :{max_players}")
+###print(f"Max players given from main process :{max_players}")
 curr_players = 0
 IPADDRESS = "0.0.0.0"
-print("IP ADDRESS", IPADDRESS)
+###print("IP ADDRESS", IPADDRESS)
 
 PORT = 17611
 connected_clients_IPs = set()
@@ -115,7 +115,7 @@ arr_players_class = [player1, player2]
 ##Killer
 
 def RUN(Maxp):
-    print("READY RUN")
+    ###print("READY RUN")
     global max_players
     max_players = int(Maxp)
     context = zmq.Context()
@@ -128,14 +128,14 @@ def RUN(Maxp):
 
     # handler processes the message and sends "Success" back to the client
     async def handler(ws, path):
-        print("inside Handeler")
+        ###print("inside Handeler")
         #websocket is the client websocket
         async for message in ws:
             global curr_players
             #if recieved message is a new connection
             registered_before = (ws.remote_address[0] in connected_clients_IPs)
             connected_clients_WSs.add(ws)
-            print(f"{ws.remote_address , connected_clients_IPs}")
+            ###print(f"{ws.remote_address , connected_clients_IPs}")
             try:
                 if not (type(message) == dict):
                     loaded_jsn_mssg = json.loads(message)
@@ -147,29 +147,29 @@ def RUN(Maxp):
                 break
 
 
-            print(f"loaded_mssg{loaded_jsn_mssg} , currplayer{curr_players} , maxPlayer{max_players}" )
+            ###print(f"loaded_mssg{loaded_jsn_mssg} , currplayer{curr_players} , maxPlayer{max_players}" )
             if curr_players<max_players and not registered_before:
                 connected_clients_WSs.add(ws)
-                print(f"GAME NOT READY YET , {curr_players}/{max_players} joined")
+                ###print(f"GAME NOT READY YET , {curr_players}/{max_players} joined")
                 connected_clients_IPs.add(ws.remote_address[0])
                 username = loaded_jsn_mssg["username"]
-                print(f"username is :{loaded_jsn_mssg['username']}")
+                ###print(f"username is :{loaded_jsn_mssg['username']}")
                 IP = ws.remote_address[0]
                 IP__username[IP] = username
                 username__id[username] = curr_players
                 id__username[curr_players] = username
-                print(f"{username} : given ID :{curr_players} ")
+                ###print(f"{username} : given ID :{curr_players} ")
                 playerCarId = json.dumps({"carID": curr_players})
                 curr_players=curr_players+1
                 await ws.send(playerCarId)
                 #add player to the game
                 if curr_players == max_players:
-                    print(" Broadcasting 'READY'....")
+                    ###print(" Broadcasting 'READY'....")
                     await broadcast("READY")
                     #TODO : SEND OTHER PLAYERS IPs for voice chat
 
             elif curr_players>=max_players and not registered_before:
-                print(f"GAME READY AND YOU ARE NOT INVITED :( ")
+                ###print(f"GAME READY AND YOU ARE NOT INVITED :( ")
                 ER_MSG = json.dumps({"ERROR": "GameFull!"})
                 ws.send(ER_MSG)
 
@@ -177,12 +177,12 @@ def RUN(Maxp):
 
             elif curr_players>=max_players and registered_before:
                 carid = username__id[IP__username[ws.remote_address[0]]]
-                print(f"GAME READY /RECIEVED FROM ID: {carid} -> {message}")
+                ###print(f"GAME READY /RECIEVED FROM ID: {carid} -> {message}")
                 if type(loaded_jsn_mssg) == str:
                     loaded_jsn_mssg = {'movement' : loaded_jsn_mssg}
                 if "movement" in loaded_jsn_mssg.keys():
                     movs = loaded_jsn_mssg["movement"]
-                    print("IT's a movement")
+                    ###print("IT's a movement")
                     processMovement(carid,movs)
                     prepareGameStatus()
                     if GameWinner == None:
@@ -190,7 +190,7 @@ def RUN(Maxp):
                     else :
 
                         await ws.send(json.dumps({"winner" : GameWinner}))
-                        print("☠☠️☠️☠️Going to kill This Process☠️☠☠️☠")
+                        ###print("☠☠️☠️☠️Going to kill This Process☠️☠☠️☠")
                         while 1:
                             killer.send_string("END")
                             time.sleep(10)
@@ -203,13 +203,13 @@ def RUN(Maxp):
 
 
     def processMovement(id,message):
-        print("processing movement.. ")
+        ###print("processing movement.. ")
         #change game status
         global arr_players_class
-        print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
+        ###print(f"curr xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
         mover_player_car = arr_players_class[id]
         movements = message.split(",")
-        print("moves = ",movements)
+        ###print("moves = ",movements)
         REDUCE = True
         if "l" in movements:
             mover_player_car.rotate(left=1)
@@ -235,13 +235,13 @@ def RUN(Maxp):
                 mover_player_car.reset()
                 global GameWinner
                 GameWinner = id__username[id]
-        print(f"new xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
+        ###print(f"new xy{arr_players_class[id].x}, {arr_players_class[id].y}" )
 
-        print("processed movement")
-        print("GOING TO prepare game status")
+        ###print("processed movement")
+        ###print("GOING TO prepare game status")
 
     def prepareGameStatus():
-        print("processing GS.. ")
+        ###print("processing GS.. ")
         # change game status
         global arr_players_class
 
@@ -249,25 +249,25 @@ def RUN(Maxp):
         for i in range(max_players):
             p = arr_players_class[i]
             playerStatus[str(i)] = {'posx': p.x ,'posy': p.y ,'angle' : p.angle}
-        print("Prepared ... ")
+        ###print("Prepared ... ")
 
         gameStatus = {'game' : playerStatus}
-        print(f"gamestaus ready to broadcast : {gameStatus}")
+        ###print(f"gamestaus ready to broadcast : {gameStatus}")
         global GS
         GS = gameStatus
 
 
     async def broadcast(message):
         # Iterate over all connected clients and send the message
-        print("inside BROADCASTING message..")
+        ###print("inside BROADCASTING message..")
         for client in connected_clients_WSs:
             try:
                 await client.send(message)
-                print("EXSTING CLIENT message sent succeffly to ", client.remote_address)
+                ###print("EXSTING CLIENT message sent succeffly to ", client.remote_address)
             except:
-                print(f"OLD client client ({client.remote_address}) no longer available removing it")
+                ###print(f"OLD client client ({client.remote_address}) no longer available removing it")
                 connected_clients_WSs.remove(client)
-        print("FINISHED BROADCASTING")
+        ###print("FINISHED BROADCASTING")
 
 
     # startServer = websockets.serve(handler, IPADDRESS, PORT)
