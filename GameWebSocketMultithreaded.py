@@ -14,6 +14,10 @@ from Screen1 import get_user_name
 if __name__ == "__main__" :
     portsChecker.PortsInit()
     get_user_name()
+    Mic_ON = 1
+    Sound_ON = 1
+
+
     wsP = mp.Process(target=wsP)
     pgP = mp.Process(target=guiP)
     kbP = mp.Process(target=kbP)
@@ -33,6 +37,8 @@ if __name__ == "__main__" :
     kbP.terminate()
     wsP.terminate()
     vcP.terminate()
+    if vcP.is_alive():
+        vcP.kill()
 
 
 

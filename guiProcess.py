@@ -129,9 +129,18 @@ def guiP():
         if MIC.draw(WIN):
             micOn ^= 1
             MIC = MICS[micOn]
+            audio_settings = {"mic_on": micOn, "sound_on": headsetOn}
+            with open("AUDIO_SETTINGS.json", "w") as outfile:
+                outfile.write(audio_settings)
         if HEADSET.draw(WIN):
             headsetOn ^= 1
             HEADSET = HEADSETS[headsetOn]
+            audio_settings = {"mic_on": micOn, "sound_on": headsetOn}
+            with open("AUDIO_SETTINGS.json", "w") as outfile:
+                outfile.write(json.dumps(audio_settings))
+
+
+
 
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
