@@ -270,7 +270,7 @@ def RUN(Maxp):
         print("FINISHED BROADCASTING")
 
 
-    startServer = websockets.serve(handler, IPADDRESS, PORT)
+    # startServer = websockets.serve(handler, IPADDRESS, PORT)
 
     async def main():
         async with websockets.serve(handler, IPADDRESS, PORT):
