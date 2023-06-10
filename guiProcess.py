@@ -130,14 +130,15 @@ def guiP():
             micOn ^= 1
             MIC = MICS[micOn]
             audio_settings = {"mic_on": micOn, "sound_on": headsetOn}
-            with open("AUDIO_SETTINGS.json", "w") as outfile:
-                outfile.write(audio_settings)
+            with open("AUDIO_SETTINGS.txt", "w") as outfile:
+                outfile.write(json.dumps(audio_settings))
         if HEADSET.draw(WIN):
             headsetOn ^= 1
             HEADSET = HEADSETS[headsetOn]
             audio_settings = {"mic_on": micOn, "sound_on": headsetOn}
-            with open("AUDIO_SETTINGS.json", "w") as outfile:
+            with open("AUDIO_SETTINGS.txt", "w") as outfile:
                 outfile.write(json.dumps(audio_settings))
+            #{micon : true , soundon : true}
 
 
 

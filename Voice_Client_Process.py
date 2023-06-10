@@ -15,6 +15,9 @@ def vcP():
     Chunks = 4096
     Channels = 2
     Rate = 44100
+    audio_settings = {"mic_on": 1, "sound_on": 1}
+    with open("AUDIO_SETTINGS.txt", "w") as outfile:
+        outfile.write(json.dumps(audio_settings))
     input_stream = p.open(format=Format,
                           channels=Channels,
                           rate=Rate,
@@ -31,11 +34,15 @@ def vcP():
 
     def send():
         while (True):
-            with open('AUDIO_SETTINGS.json', 'r') as openfile:
+            with open('AUDIO_SETTINGS.txt', 'r') as openfile:
                 try:
-                    audio_settings = json.loads(openfile)
-                except:
-                    print("couldn't read audio")
+                    for o in openfile:
+                        print(f"[audo Settings/M] {type(o)} , {o}")
+
+                        audio_settings = json.loads(o)
+
+                except Exception as e:
+                    print(f"Exception send: {e}")
                     audio_settings = {"mic_on":True , "sound_on":True}
             try:
                 data = input_stream.read(Chunks)
@@ -46,11 +53,14 @@ def vcP():
 
     def receive():
         while (True):
-            with open('AUDIO_SETTINGS.json', 'r') as openfile:
+            with open('AUDIO_SETTINGS.txt', 'r') as openfile:
                 try:
-                    audio_settings = json.loads(openfile)
-                except:
-                    print("couldn't read audio")
+                    for o in openfile:
+                        print(f"[audo Settings/M] {type(o)} , {o}")
+
+                        audio_settings = json.loads(o)
+                except Exception as e:
+                    print(f"Exception rec: {e}")
                     audio_settings = {"mic_on":True , "sound_on":True}
             try:
                 data = client.recv(Chunks)
