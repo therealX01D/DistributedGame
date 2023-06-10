@@ -4,6 +4,7 @@ import threading
 client = []
 
 def vcsP():
+    print("Hello voice Server")
     port = 17601
     host = "0.0.0.0"
 
