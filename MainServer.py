@@ -12,10 +12,11 @@ if __name__ == "__main__":
     maxP = int(input("Enter Number of Max players"))
     while True:
         ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
-        # VoiceProcess = mp.Process(target=VCserverProcess.vcsP())
+        time.sleep(5)
+        VoiceProcess = mp.Process(target=VCserverProcess.vcsP())
         print("Starting Process")
         ServerProcess.start()
-        # VoiceProcess.start()
+        VoiceProcess.start()
         print("Staerted Process....")
         if(vis == False):
             vis = True
@@ -26,17 +27,17 @@ if __name__ == "__main__":
         print("Sleeping 4 seconds")
         time.sleep(4)
         ServerProcess.terminate()
-        # VoiceProcess.terminate()
+        VoiceProcess.terminate()
         ServerProcess.join(timeout=3)
-        # VoiceProcess.join(timeout=1)
+        VoiceProcess.join(timeout=1)
         if ServerProcess.is_alive():
             ServerProcess.kill()
             "SERVER PROCESS KILLED"
         else :
             print("SERVER PROCESS SURRENDERED")
 
-        # if VoiceProcess.is_alive():
-        #     VoiceProcess.kill()
-        #     "VOICE PRINT KILLED"
-        # else :
-        #     print("VOICE PROCESS SURRENDERED")
+        if VoiceProcess.is_alive():
+            VoiceProcess.kill()
+            "VOICE PRINT KILLED"
+        else :
+            print("VOICE PROCESS SURRENDERED")
