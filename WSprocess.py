@@ -11,28 +11,28 @@ dicitonary = read_dictionary_from_file()
 READY = False
 ServerPort = 17611
 def on_open(ws):
-    print("Connection opened")
+    ###print("Connection opened")
     UN = "oaayoub"
     f = open("username", "r")
     UN = str(f.read())
     f.close()
-    print(UN)
+    ###print(UN)
     ws.send(json.dumps({"username" : UN}))
 
 def on_message(ws, message): #recieve
     # TODO : a try to fix window issue
-    print('(ON MESSAGE) ..S')
-    print(f"[Received From Server] {message}")
+    ###print('(ON MESSAGE) ..S')
+    ###print(f"[Received From Server] {message}")
     try:
         loaded_jsn_msg = json.loads(message)
     except:
-        # print("NOT JSON MESSAGE : ", message)
+        # ###print("NOT JSON MESSAGE : ", message)
         loaded_jsn_msg = message
 
-    # print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
+    # ###print(f"before process msgtype ({type(loaded_jsn_msg)}) => ({message})")
     if isinstance(loaded_jsn_msg, str):
         if message == "READY":
-            # print("I GOT 'READY' message..")
+            # ###print("I GOT 'READY' message..")
             global READY
             READY = True
             global dicitonary
@@ -42,32 +42,32 @@ def on_message(ws, message): #recieve
             pshr.bind("tcp://*:" + str(KBaccPort))
             pshr.send_string("READY")
     if isinstance(loaded_jsn_msg, dict):
-        print("ITS DICT")
+        ###print("ITS DICT")
         if "carID" in loaded_jsn_msg.keys():
             global carID
             carID = int(loaded_jsn_msg["carID"])
 
         elif "game" in loaded_jsn_msg.keys():
             gameStatus = loaded_jsn_msg["game"]
-            # print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
+            # ###print(f"[Game Status]: {gameStatus}")  # {'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle} ,'1' :  {'posx': p.x ,'posy': p.y ,'angle' : p.angle}}
             global pusher
             pusher.send_string(json.dumps(gameStatus))
         elif "winner" in loaded_jsn_msg.keys():
             pusher.send_string(message)
 
-    # print(f"(ON MESSAGE) ..E") #
+    # ###print(f"(ON MESSAGE) ..E") #
 
 def on_error(ws, error):
     print("*Error*", error)
 
 def on_close(wsa, close_status_code, close_msg="close"):
     #TODO : change status of username to disconnected
-    print("Connection closing")
+    ###print("Connection closing")
     wsa.send(close_msg)
-    print("Connection closing")
+    ###print("Connection closing")
 
 def sendMovementThread():
-    print("Send movement thread")
+    ###print("Send movement thread")
     global WS , READY
     context = zmq.Context()
     puller = context.socket(zmq.PULL)
@@ -106,4 +106,4 @@ def wsP():
     smt.start()
     # while 1:
     #     ws.run_forever()
-    #     print("RECONNECTING")
+    #     ###print("RECONNECTING")

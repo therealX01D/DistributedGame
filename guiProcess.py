@@ -145,7 +145,7 @@ def guiP():
         pygame.display.update()  # update screen
         gameString = puller.recv_string()
         gameStatus = json.loads(gameString)
-        print(f"[WS -> GUI] : {gameStatus}")
+        ###print(f"[WS -> GUI] : {gameStatus}")
         if "winner" in gameStatus.keys() :
             #This is not a gameStatus this is the winner username
             winner = gameStatus["winner"]
