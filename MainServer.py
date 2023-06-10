@@ -1,8 +1,8 @@
 import multiprocessing as mp
 import time
 
-import Server
-import VCserverProcess
+from VCserverProcess import vcsP
+from Server import RUN
 import zmq
 context = zmq.Context()
 puller = context.socket(zmq.PULL)
@@ -11,11 +11,11 @@ if __name__ == "__main__":
     print("MAIN SERVER ")
     maxP = int(input("Enter Number of Max players"))
     while True:
-        VoiceProcess = mp.Process(target=VCserverProcess.vcsP())
-        ServerProcess = mp.Process(target=Server.RUN, args=(maxP,))
+        ServerProcess = mp.Process(target=RUN, args=(maxP,))
+        VoiceProcess = mp.Process(target=vcsP)
         print("Starting Process")
-        VoiceProcess.start()
         ServerProcess.start()
+        VoiceProcess.start()
         print("Staerted Process....")
         if(vis == False):
             vis = True
