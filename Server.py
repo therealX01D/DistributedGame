@@ -110,7 +110,7 @@ class PlayerCar(AbstractCar):
 
 
 player1 = PlayerCar(4, 4, 0, (170, 350))
-player2 = PlayerCar(4, 4, 1, (200, 210))
+player2 = PlayerCar(4, 4, 1, (200, 350))
 arr_players_class = [player1, player2]
 ##Killer
 
