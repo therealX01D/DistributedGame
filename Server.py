@@ -188,8 +188,12 @@ def RUN(Maxp):
                     if GameWinner == None:
                         await ws.send(json.dumps(GS))
                     else :
-
-                        await ws.send(json.dumps({"winner" : GameWinner}))
+                        winner_msg= json.dumps({"winner" : GameWinner})
+                        for client in connected_clients_WSs:
+                            try:
+                                await client.send(winner_msg)
+                            except:
+                                connected_clients_WSs.remove(client)
                         ###print("☠☠️☠️☠️Going to kill This Process☠️☠☠️☠")
                         while 1:
                             killer.send_string("END")
