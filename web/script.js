@@ -6,14 +6,16 @@ window.addEventListener("DOMContentLoaded",function(e){
 
   const websocket = new WebSocket("ws://13.37.101.135:8001/");
   //while (websocket.readyState != WebSocket.OPEN);
-  sendChat(inputspace,websocket);  
+  sendChat(inputspace,websocket);
   recievingChat(outputspace,websocket);
   initializeuser(websocket);
 });
 function initializeuser(websocket){
   const handleSend = () => {
     if (websocket.readyState === WebSocket.OPEN) {
-      username= new String(this.prompt("enter username"));
+      eel.getUN()().then((r)=>{
+        username = r;
+      });
       const event={
       "type":"adduser",
       "usrname":username
