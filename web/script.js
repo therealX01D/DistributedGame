@@ -1,14 +1,17 @@
-let userid = "";
-let username = "";
+let userid = localStorage.getItem("userid");
+let username = localStorage.getItem("username");
 window.addEventListener("DOMContentLoaded",function(e){
   const inputspace = document.querySelector('#txt_input');
   const outputspace = document.querySelector('#extmsg');
 
   const websocket = new WebSocket("ws://13.37.101.135:8001/");
   //while (websocket.readyState != WebSocket.OPEN);
-  sendChat(inputspace,websocket);
+  sendChat(inputspace,websocket);  
   recievingChat(outputspace,websocket);
+  console.log(userid);
+  if (userid==null){
   initializeuser(websocket);
+  }
 });
 function initializeuser(websocket){
   const handleSend = () => {
@@ -16,6 +19,7 @@ function initializeuser(websocket){
       eel.getUN()().then((r)=>{
         username = r;
       });
+      localStorage.setItem("username",username);
       const event={
       "type":"adduser",
       "usrname":username
@@ -104,7 +108,7 @@ function addchat(name,date,text,chat,otherchat){
 }
 function sendChat(input, websocket) {
   // When clicking a column, send a "play" event for a move in that column.
-  input.addEventListener("keypress", ( e ) => {
+  input.addEventListener("keydown", ( e ) => {
     if (e.key === 'Enter') {
       // code for enter
         let userchat =document.querySelector('#usermsg');
@@ -122,9 +126,15 @@ function sendChat(input, websocket) {
           "text": inputxt,
           "Date": date
         }
+        console.log(JSON.stringify(event));
         websocket.send(JSON.stringify(event));
+        document.querySelector('#txt_input').value="";
     }
-    
+    if(e.ctrlKey){
+      console.log("control pressed");
+      localStorage.clear();
+    }
+  
   });
 }
 function showMessage(message) {
@@ -144,12 +154,19 @@ function recievingChat(outputspace,websocket){
       case "chat":
         // Update the UI with the move.
 
-        if (event.userid!=userid){
+        if (event.userid != userid){
           addchat(event.usrname,event.Date,event.text,extchat,otherchat);
+        }
+        else{
+          if(event.cached != undefined){
+            addchat(event.usrname,event.Date,event.text,otherchat,extchat);
+          }
         }
         break;
       case "acceptinit":
-        userid = event.userid;
+        console.log("recieved",event.userid);
+        userid=event.userid;
+        localStorage.setItem("userid",event.userid);
         // No further messages are expected; close the WebSocket connection.
         break;
       case "error":
