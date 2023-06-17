@@ -1,5 +1,5 @@
 let userid = localStorage.getItem("userid");
-let username = localStorage.getItem("username");
+var username = localStorage.getItem("username");
 window.addEventListener("DOMContentLoaded",function(e){
   const inputspace = document.querySelector('#txt_input');
   const outputspace = document.querySelector('#extmsg');
@@ -17,14 +17,17 @@ function initializeuser(websocket){
   const handleSend = () => {
     if (websocket.readyState === WebSocket.OPEN) {
       eel.getUN()().then((r)=>{
+        console.log("got username",r);
         username = r;
+        localStorage.setItem("username",username);
+        const event={
+        "type":"adduser",
+        "usrname":username
+      };
+      websocket.send(JSON.stringify(event));
+      console.log("sent event",event);
       });
-      localStorage.setItem("username",username);
-      const event={
-      "type":"adduser",
-      "usrname":username
-    };
-    websocket.send(JSON.stringify(event));
+
     }
     else if (websocket.readyState == WebSocket.CONNECTING) {
       // Wait for the open event, maybe do something with promises
