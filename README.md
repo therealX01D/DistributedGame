@@ -4,9 +4,9 @@
 ## Main Contributers
 | Name | Github |
 |-----|-----|
-| Omar Ayman Ayoub | ![](https://github.com/oaayoub) |
-|Omer Ashraf | ![](https://github.com/omer-awwad) |
-|Mahmoud Mohamed Omar | ![](https://github.com/therealX01D) |
+| Omar Ayman Ayoub | ![O](https://github.com/oaayoub) |
+|Omer Ashraf | ![O](https://github.com/omer-awwad) |
+|Mahmoud Mohamed Omar | ![O](https://github.com/therealX01D) |
 
 ## Description
 This is a multiplayer racing game with extra features as voice chat, text chat
