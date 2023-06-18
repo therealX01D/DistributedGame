@@ -111,7 +111,10 @@ class PlayerCar(AbstractCar):
 
 player1 = PlayerCar(4, 4, 0, (170, 210))
 player2 = PlayerCar(4, 4, 1, (200, 210))
-arr_players_class = [player1, player2]
+player3 = PlayerCar(4, 4, 2, (185, 210))
+player4 = PlayerCar(4, 4, 3, (170, 210))
+player5 = PlayerCar(4, 4, 4, (200, 210))
+arr_players_class = [player1, player2,player3,player4,player5]
 ##Killer
 
 def RUN(Maxp):

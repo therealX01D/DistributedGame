@@ -93,10 +93,10 @@ def guiP():
 
     player1 = PlayerCar(4, 4, 0, (180, 260))  # RED
     player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
-    player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
-    player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
-    player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
-    arr_players_class = [player1, player2]
+    player3 = PlayerCar(4, 4, 2, (170, 260))  # GREEN
+    player4 = PlayerCar(4, 4, 3, (170, 260))  # GREEN
+    player5 = PlayerCar(4, 4, 4, (170, 260))  # GREEN
+    arr_players_class = [player1, player2,player3,player4,player5]
 
     context = zmq.Context()
     puller = context.socket(zmq.PULL)
