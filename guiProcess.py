@@ -93,6 +93,9 @@ def guiP():
 
     player1 = PlayerCar(4, 4, 0, (180, 260))  # RED
     player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
+    player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
+    player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
+    player2 = PlayerCar(4, 4, 1, (170, 260))  # GREEN
     arr_players_class = [player1, player2]
 
     context = zmq.Context()
