@@ -68,7 +68,8 @@ def guiP():
     GREEN_CAR = scaleImage(pygame.image.load("imgs/green-car.png"), 0.3, 0.3)
     GREY_CAR = scaleImage(pygame.image.load("imgs/grey-car.png"), 0.3, 0.3)
     PURPLE_CAR = scaleImage(pygame.image.load("imgs/purple-car.png"), 0.3, 0.3)
-    CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR]
+    WHITE_CAR = Helpers.scaleImage(pygame.image.load("imgs/white-car.png"), 0.3, 0.3)
+    CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR, WHITE_CAR]
     WIDTH, HEIGHT = TRACK.get_width(), TRACK.get_height()
     WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 

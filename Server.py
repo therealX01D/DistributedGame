@@ -31,7 +31,8 @@ RED_CAR = Helpers.scaleImage(pygame.image.load("imgs/red-car.png"), 0.3, 0.3)
 GREEN_CAR = Helpers.scaleImage(pygame.image.load("imgs/green-car.png"), 0.3, 0.3)
 GREY_CAR = Helpers.scaleImage(pygame.image.load("imgs/grey-car.png"), 0.3, 0.3)
 PURPLE_CAR = Helpers.scaleImage(pygame.image.load("imgs/purple-car.png"), 0.3, 0.3)
-CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR]
+WHITE_CAR = Helpers.scaleImage(pygame.image.load("imgs/white-car.png"), 0.3, 0.3)
+CAR_IMGS = [RED_CAR, GREEN_CAR, GREY_CAR, PURPLE_CAR,WHITE_CAR]
 
 GRASS = Helpers.scaleImage(pygame.image.load("imgs/grass.jpg"), 2.5, 2.5)
 TRACK = pygame.image.load("imgs/track.png")
